@@ -59,10 +59,10 @@ class THSOutput : public THSHisto{
   TList* fParEntryLists;
 
   Bool_t fSaveID; //Ony save ID if this is the first THSOutput tree, subsequent trees will aready contain this branch
-  Int_t fgID; //global event ID number, should be set in first instance of THSOutput and preserved through further steps. Required to synchornise differnt trees as PROOF does not preserve event ordering
-
+  Double_t fgID; //global event ID number, should be set in first instance of THSOutput and preserved through further steps. Required to synchornise differnt trees as PROOF does not preserve event ordering
+  Long64_t fgIDoff; //starting offset for ID number
  public :
- THSOutput() : fFile(0), fProofFile(0), fOutTree(0),fCurTree(0), fEntryList(0),fStepDir(0),fSelInput(0),fSelOutput(0), fCodeList(0),fParentFile(0),fParentTree(0), fParEntryLists(0) {fSaveID=kFALSE;}   
+ THSOutput() : fFile(0), fProofFile(0), fOutTree(0),fCurTree(0), fEntryList(0),fStepDir(0),fSelInput(0),fSelOutput(0), fCodeList(0),fParentFile(0),fParentTree(0), fParEntryLists(0) {fSaveID=kFALSE;fgID=0;fgIDoff=0;}   
   virtual ~THSOutput();
 
   virtual void InitOutput(); //Configure the output file and tree 
@@ -94,7 +94,13 @@ class THSOutput : public THSHisto{
   void InitParent(TTree* ctree,TString step);
   Long64_t GetParentEntry(Long64_t parentry);
   void SortTree(TTree* tree);
+  
+  TTree* GetOutTree() {return fOutTree;}
+  THSParticle* GetHSParticle(Int_t np){return fDetParticle[np];}
+  vector<UInt_t> GetNType(){return fNtype;}
+  vector<Int_t> GetFinalState(){return fFinalState;}
 
+  void SetIDoff(Long64_t off) {fgIDoff=off;}
   //Setter functions may be needed if using without TSelector
   void SetParticles(TString sp){fStrParticles=sp;}
 };

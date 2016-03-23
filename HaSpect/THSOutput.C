@@ -73,6 +73,9 @@ void  THSOutput::HSSlaveBegin(TList* input,TList* output){
   //Make the entry list, this records the events used from the input chain
   fEntryList=new TEntryList("HSelist","Entry List");
   fSelOutput->Add(fEntryList);
+
+  //Start the ID from the offset if
+  fgID=fgIDoff;	
 };
 void THSOutput::HSNotify(TTree* tree){
   //Function that looks after the output file
@@ -100,7 +103,8 @@ void THSOutput::HSProcessStart(Long64_t entry){
   fEntry=entry;
 }
 void THSOutput::HSProcessFill(){
-  if(fSaveID) fgID=fEntry;
+  //if(fSaveID) fgID=fEntry;
+  if(fSaveID) fgID++;
   else if(fOutTree) fCurTree->GetBranch("fgID")->GetEntry(fEntry); //make sure get ID branch to write to new file
   if(fEntryList)fEntryList->Enter(fEntry);
   if(fOutTree) fOutTree->Fill();
@@ -389,7 +393,7 @@ void THSOutput::SortTree(TTree* tree){
   //Make sure the file you are writing to is the current directory
   
   //order the events based on the global ID variable, which came from the original tree
-  cout<<"Sorting tree"<<endl;
+  cout<<"THSOutput::SortTree Sorting tree You may want to disable this?"<<endl;
   if(!tree) return;
   if(!tree->GetBranch("fgID")) return;
   cout<<" Make index "<< tree->BuildIndex("fgID")<<endl;
@@ -452,7 +456,7 @@ void THSOutput::InitOutTree(){
      fOutTree->SetDirectory(fFile);
      fOutTree->AutoSave();
      //cout<<fOutTree->GetBranch("fgID")<<fSaveID<<endl;
-     if(!fOutTree->GetBranch("fgID"))fOutTree->Branch("fgID", &fgID, "fgID/I");
+     if(!fOutTree->GetBranch("fgID"))fOutTree->Branch("fgID", &fgID, "fgID/D");
      if(!fSaveID)//copy existing global ID
        fOutTree->SetBranchAddress("fgID",fCurTree->GetBranch("fgID")->GetAddress());
    }

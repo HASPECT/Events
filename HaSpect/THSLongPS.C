@@ -52,12 +52,12 @@ void THSLongPS::MakeIndices(Int_t Np,Int_t Nt){//number of particle, number of p
     fSectName.push_back("F_");
     //   sBot.Clear();
     vector<Bool_t> isFor(Np);
-    for(UInt_t isp=0;isp<Nt;isp++){
+    for(Int_t isp=0;isp<Nt;isp++){
       fSectName[fSector]+=sPart[fITop[fSector][isp]]+"_";//make name
       isFor[fITop[fSector][isp]]=kTRUE;//make sector condition
     }
     fSectName[fSector]+="B_";
-    for(UInt_t isp=0;isp<Np-Nt;isp++){
+    for(Int_t isp=0;isp<Np-Nt;isp++){
       fSectName[fSector]+=sPart[fIBot[fSector][isp]]+"_";
       isFor[fIBot[fSector][isp]]=kFALSE;//make sector condition
     }
@@ -70,11 +70,11 @@ void THSLongPS::MakeIndices(Int_t Np,Int_t Nt){//number of particle, number of p
  }
 
 void THSLongPS::PrintVector(vector<Int_t> vecI){
-  for(Int_t i=0;i<vecI.size();i++)cout<<vecI[i]<<" ";
+  for(UInt_t i=0;i<vecI.size();i++)cout<<vecI[i]<<" ";
   cout<<endl;
 }
 void THSLongPS::PrintVector(vector<Bool_t> vecI){
-  for(Int_t i=0;i<vecI.size();i++)cout<<vecI[i]<<" ";
+  for(UInt_t i=0;i<vecI.size();i++)cout<<vecI[i]<<" ";
   cout<<endl;
 }
 
@@ -85,6 +85,88 @@ void THSLongPS::AddParticle(TLorentzVector p4){//add 4 vectors should be done fo
   }
 }
 
+void THSLongPS::AnalyseCMHelicity(TLorentzVector *zLV){
+  TLorentzVector zVec=(*zLV);
+  fCM+=zVec;
+  TVector3 CMboost=-fCM.BoostVector();
+  zVec.Boost(CMboost);
+  TVector3 zCM=-zVec.Vect().Unit();
+  TVector3 yCM=CMboost.Cross(zVec.Vect()).Unit();
+  TVector3 xCM=yCM.Cross(zCM).Unit();
+  fPtot=0;//total longitudinal momentum
+  vector< Bool_t > whichForward(fSize); //whichForward[2]=kTRUE means particle 2 is going forward
+  for(Int_t ip=0;ip<fSize;ip++){
+    fP4s[ip].Boost(CMboost); //cm boost
+    TVector3 p3CM(fP4s[ip].Vect().Dot(xCM),fP4s[ip].Vect().Dot(yCM),fP4s[ip].Vect().Dot(zCM));
+    whichForward[ip]=p3CM.Z()>0;
+    //fP4s[ip].SetVectM(p3CM,fP4s[ip].M());
+    fPtot+=p3CM.Z()*p3CM.Z();
+  }
+  //   fPtot=TMath::Sqrt(fPtot);
+  fPtot=zVec.Rho();
+  fCosTh=-TMath::Cos(fCM.Angle(zVec.Vect()));
+  TLorentzVector p4boost(fP4s[0]+fP4s[1]);
+  p4boost.SetTheta(0);
+  TVector3 boostIso=p4boost.BoostVector();
+
+  Double_t B12=breakupMomentum((fP4s[0]+fP4s[1]).M(),fP4s[0].M(),fP4s[1].M());
+  Float_t fPmin[2];
+  Float_t fPmax[2];
+  TLorentzVector pmin(0,0,-B12,sqrt(B12*B12+fP4s[1].M2())); //backward in helcity frame
+  pmin.Boost(boostIso);//boost along helicity z axis to CM
+  fPmin[1]=pmin.Z(); //minium longitudinal momentum allowed for isobar
+  pmin=TLorentzVector(0,0,-B12,sqrt(B12*B12+fP4s[0].M2())); //backward in helcity frame
+  // cout<<pmin.Beta()<<endl;
+  pmin.Boost(boostIso);//boost along helicity z axis to CM
+  fPmin[0]=pmin.Z(); //minium longitudinal momentum allowed for isobar
+  
+  pmin=TLorentzVector(0,0,B12,sqrt(B12*B12+fP4s[1].M2())); //backward in helcity frame
+  pmin.Boost(boostIso);//boost along helicity z axis to CM
+  fPmax[1]=pmin.Z(); //minium longitudinal momentum allowed for isobar
+  pmin=TLorentzVector(0,0,B12,sqrt(B12*B12+fP4s[0].M2())); //backward in helcity frame
+  pmin.Boost(boostIso);//boost along helicity z axis to CM
+  fPmax[0]=pmin.Z(); //minium longitudinal momentum allowed for isobar
+
+  for(fSector=0;fSector<fNSector;fSector++)
+    if(fIsForward[fSector]==whichForward) break;
+  
+  // if(boostIso.Z()<0){fPmin[0]=fPmax[0];fPmin[1]=fPmax[1];}
+  if(fCosTh>0){
+  fOmegaCut[0]=TMath::ATan2(fPmin[0],fPmax[1]);
+  fOmegaCut[1]=TMath::ATan2(fPmax[0],fPmin[1]);
+  //fOmega=TMath::ATan2(fP4s[0].Z(),fP4s[1].Z())*TMath::RadToDeg();
+  }
+  else{
+  fOmegaCut[1]=TMath::ATan2(-fPmax[0],-fPmin[1]);
+  fOmegaCut[0]=TMath::ATan2(-fPmin[0],-fPmax[1]);
+  }
+}
+double THSLongPS::BetaPM(double p0, double m0){
+  //Warning return -ve if p0<0 
+ //beta =p/E
+  return p0/sqrt(p0*p0+m0*m0);
+}
+// double THSLongPS::BetaPM(double p0, double m0){
+//   //Warning return -ve if p0<0 
+//  //beta =p/E
+//   return p0/sqrt(p0*p0+m0*m0);
+// }
+double THSLongPS::breakupMomentum( double mass0, double mass1, double mass2 ){
+   
+  double q;
+  
+  // fabs -- correct?  consistent w/ previous E852 code
+  q = sqrt( fabs(   mass0*mass0*mass0*mass0 + 
+                    mass1*mass1*mass1*mass1 +
+                    mass2*mass2*mass2*mass2 -
+                    2.0*mass0*mass0*mass1*mass1 -
+                    2.0*mass0*mass0*mass2*mass2 -
+                    2.0*mass1*mass1*mass2*mass2  ) ) / (2.0 * mass0);
+  
+  return q;
+  
+}
+
 void THSLongPS::Analyse(){
    //Construct the CM boosts
    TVector3 CMboost=-fCM.BoostVector();
@@ -92,20 +174,46 @@ void THSLongPS::Analyse(){
  
   //loop over particles and check if they are going forward in CM
   vector< Bool_t > whichForward(fSize); //whichForward[2]=kTRUE means particle 2 is going forward
+  fPtot=0;//total longitudinal momentum
   for(Int_t ip=0;ip<fSize;ip++){
     fP4s[ip]=(CMRot*(fP4s[ip])); //cm boost
     whichForward[ip]=fP4s[ip].Z()>0;
+    fPtot+=fP4s[ip].Z()*fP4s[ip].Z();
   }
+  fPtot=TMath::Sqrt(fPtot);
+
   for(fSector=0;fSector<fNSector;fSector++)
     if(fIsForward[fSector]==whichForward) break;
   
   //Now calculate masses of Top and Bottom particles
   TLorentzVector pTop;
-  for(Int_t ip=0;ip<fITop[fSector].size();ip++) pTop+=fP4s[fITop[fSector][ip]];
+  for(UInt_t ip=0;ip<fITop[fSector].size();ip++) pTop+=fP4s[fITop[fSector][ip]];
   fMTop=pTop.M();
   fCosTh=pTop.CosTheta();
 
   TLorentzVector pBot;
-  for(Int_t ip=0;ip<fIBot[fSector].size();ip++) pBot+=fP4s[fIBot[fSector][ip]];
+  for(UInt_t ip=0;ip<fIBot[fSector].size();ip++) pBot+=fP4s[fIBot[fSector][ip]];
   fMBot=pBot.M();
+}
+Float_t THSLongPS::GetOmegaDG(){
+  if(fSize==2) return TMath::ATan2(fP4s[0].Z(),fP4s[1].Z());
+  else return 0;
+}
+Float_t THSLongPS::GetOmega(){
+  //Vincnet
+  // Float_t Omega=asin(-fP4s[0].Z()/fPtot/sqrt(2./3))+TMath::Pi();
+
+  //Omega only properly defined for 3 particles
+  Float_t Omega=asin(fP4s[0].Z()/fPtot/sqrt(2./3));
+ 
+  //or should probably be 
+  // if(TMath::Abs(Omega)>90) Omega=TMath::Pi()-Omega;
+  // else if(fP4s[0].Z()<0) Omega=2*TMath::Pi()+Omega;
+
+  if(fP4s[1].Z()>0&&fP4s[2].Z()<0) Omega=TMath::Pi()-Omega;
+  else if(fP4s[1].Z()<0&&fP4s[2].Z()<0&&fP4s[2].Z()<fP4s[1].Z())  Omega=TMath::Pi()-Omega;
+  else if(fP4s[1].Z()>0&&fP4s[2].Z()>0&&fP4s[2].Z()<fP4s[1].Z())  Omega=TMath::Pi()-Omega;
+  else if(fP4s[0].Z()<0) Omega=2*TMath::Pi()+Omega;
+ 
+  return Omega;
 }

@@ -53,10 +53,6 @@ void THSHisto::LoadHistograms(){
     fVecHistBin.push_back(fVecHistCut);//Add all the histograms for this kin bin
     fVecHistCut.clear(); //clear the previous bin histograms  
   }
-  //keep a list of events in each bin
-  fBinEntryLists=new TObjArray(Nbins);
-  fBinEntryLists->SetName("HSKinBinsList");
-  fBinEntryLists->SetOwner(kTRUE);
   //ifmultiple kinematic bins defined make a histogram for each bin
   TString sBin;
   for(Int_t ib=0;ib<Nbins;ib++){
@@ -66,24 +62,19 @@ void THSHisto::LoadHistograms(){
     //iterate over cuts
     for(vector< TString >::iterator nextcut=fVecCuts.begin();nextcut!=fVecCuts.end();++nextcut){
       //Call the users Histogram list for each declared cut
+      // HistogramList(fVecCuts[ncut++]+sBin); //construct all histograms for this bin, note for ChangeNames to work _Bin%d must be the last part of the name
       HistogramList(fVecCuts[ncut++]+fVecBinNames[ib]); //construct all histograms for this bin,
       fVecHistCut.push_back(fHistNameMap); //enter the histograms for this cut into a vector element
       fHistNameMap.clear(); //clear the previous cut histograms
-
-     }
+    }
     fVecHistBin.push_back(fVecHistCut);//Add all the histograms for this kin bin
     fVecHistCut.clear(); //clear the previous bin histograms
-    //Add an entry list for each kinematic bin
-    TEntryList* el=new TEntryList(TString("HSBin_")+fVecBinNames[ib],TString("HSBin_")+fVecBinNames[ib]);
-    fBinEntryLists->Add(el);
-    if(dynamic_cast<TSelector*>(this)) dynamic_cast<TSelector*>(this)->GetOutputList()->Add(el);
   }
 }
 
 TH1* THSHisto::MapHist(TH1* hist){
   //Place histograms in map for quick look up via their name
   //This should be called in HistogramList and returns the histogram to add to the slector output
-  hist->Sumw2(); //Call sumw2 function for all histograms by default; note doesn't make particular sense to do this here but it is most convenient
   fHistNameMap[TString(hist->GetName())]=hist;
   return hist;
 }
@@ -95,10 +86,8 @@ Int_t THSHisto::GetKinBin(Float_t ev1,Float_t ev2,Float_t ev3){
 }
 TH1* THSHisto::FindHist(TString hname){
   //function that finds the correct histogram for the user to fill
-  //requires the current cut and bin be set beforehand, usually in FillHistograms  
-  TString sLabel;
-  sLabel=fCurrCut+fVecBinNames[fCurrBin];
-  return fVecHistBin[fCurrBin][fMapCuts[fCurrCut]][hname+sLabel];
+  //requires the current cut and bin be set beforehand, usually in FillHistograms
+  return fVecHistBin[fCurrBin][fMapCuts[fCurrCut]][hname];
 }
 TString THSHisto::GetStrBin(Float_t ev1,Float_t ev2){
   //Function that finds the bin number and converts it to a string
@@ -154,7 +143,7 @@ void THSHisto::ChangeNames(/*TFile* list*/){
 	  tagname3=fHisbins->GetZaxis()->GetTitle();
 	  numb.Form("%1.2f_",fHisbins->GetZaxis()->GetBinCenter(zi));
 	  tagname3+=numb;
-	 if(Naxis==3){
+	 if(Naxis==2){
 	   xyz=fHisbins->GetBin(xi,yi,zi);
 	   binstr.Form("Bin%d",xyz);
 	   //fBinMap[binstr]=tagname1+tagname2+tagname3;
@@ -167,12 +156,6 @@ void THSHisto::ChangeNames(/*TFile* list*/){
   }
   
 }
-void THSHisto::SetBinEntryListsTree(TTree* elt){
-  if(!fBinEntryLists)return;
-  for(Int_t ibel=0;ibel<fBinEntryLists->GetEntries();ibel++)
-    ((TEntryList*)(fBinEntryLists->At(ibel)))->SetTree(elt);
-}
-
 /* void THSHisto::DrawAll(){ */
 /*   //one canvas per histogram */
 /*   //one pad per bin (max 8 per canvas) */

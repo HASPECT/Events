@@ -1,0 +1,156 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+support for FROST target          26-AUG-2010 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Now supports g11a target          13-DEC-2004
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Now it supports g10a target       07-SEP-2004 (EAP)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+!!!!!!!!!!! NEW FEATURE !!!!!!!!!!!!!!!!!!!! 11-JUN-2002 (EAP)
+Now ELOSS package can work with target an Start-counter positioned 
+off center of the CLAS. There is new finction to initialize geometry 
+for Eloss package:
+
+(C) void InitEloss(int RunNo)
+(F) CALL INITELOSS(runno)
+
+it is supposed to be called at the beginning of the run, like all 
+other initialization routines. It reads ST position and Target position 
+from the GEOMERY.map. If it fails to get information from the map, 
+both positions will be set to default, which is CLAS center. 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Now it supports g8/g6c target        11-JUN-2002 (EAP)
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+This is a set of subroutines for energy loss corrections in the cryotarget
+and start counter. The target geometry is for photon runs.  For
+given reconstructed particle momentum it calculates particle momentum
+at the vertex. Works for any charged particle with a charge equal to 1
+and heavier than electron. Valid momentum range 0.05<p/m<50.
+==== 24-FEB-2004 (EAP) revision === added air gap betweem ST and DC R1
+
+Main subroutine is MOMCOR.  It calls all the others.
+
+-----------------------
+Calling sequence (fortran):
+
+CALL MOMCOR (POUT, PMASS, VERTEX, IFLAG, ICELL, PIN)
+
+Input parameters:
+
+POUT(3) (real) - 3-vector of particle momentum after start counter.
+PMASS (real) - particle mass
+VERTEX(3) (real) - vertex coordinates. For single track events use 
+vertex from MVRT bank. 
+
+IFLAG (integer) - full/empty target flag:
+
+IFLAG=0 - empty target. For IFLAG=0 no energy losses in target.
+IFLAG=1 - LH2 target
+IFLAG=2 - LD2 target
+IFLAG=3 - L3He target
+IFLAG=4 - L4He target
+
+ICELL (integer) - target cell type:
+
+ICELL=0 - no target 
+ICELL=1 - g1a/g1b/g6a/g6b cell
+ICELL=2 - g2a cell
+ICELL=3 - g1c cell
+ICELL=4 - g3 cell
+ICELL=5 - g8a/g6c cell
+ICELL=6 - g10a cell
+ICELL=7 - g11a cell
+ICELL=8 - eg3a cell
+ICELL=9 - FROST g9a
+
+Output parameter:
+
+PIN(3) (real) - 3-vector of particle momentum at vertex.
+
+------------
+Calling sequence (C-code):
+the c function returns a four vector and is merely 
+a wrapper for the fortran call. It uses vector type to make the 
+calling sequence easy.
+
+A)
+iclude the prototype definition with: 
+#include <eloss.h>             
+
+which has the following line in it:
+
+vector4_t c_momcor(vector4_t p_out,float pmass,vector3_t vertex,\
+int iflag,int icell);
+
+B) then just make the call as :
+
+pf_in = c_momcor(pf_out,pmass,mvrt->mvrt[0].vert,iflag, icell);
+-------------------------------------------
+4-vector pf_in is what you want -- particle momentum at vertex.
+
+
+Function LOSS could be used as stand-alone routine. For given moment
+after absorber it calculates particle momentum before the absorber.
+Currently it works for liqid hydrogen, carbon, plastic scintillator, 
+liquid deuterium, and liquid 3He. 
+
+Calling sequence:
+
+Ierr = LOSS (mate, thick, pmass, pout, pin)
+
+Input parameters:
+
+POUT(3) - 3-vector of particle momentum after absorber
+
+PMASS - particle mass
+
+THICK - material thickness
+
+MATE (integer) - material index:
+
+MATE = 1 liquid hydrogen
+MATE = 2 plastic scintillator
+MATE = 3 carbon
+MATE = 4 liquid deuterium
+MATE = 5 liquid 3He
+MATE = 6 aluminum
+MATE = 7 liquid 4He
+MATE = 8 air (gas)
+MATE = 9 butanol g9a (density 0.538 g/cc) 
+MATE = 10 polyethylene (CH2) g9a (density 1.41 g/cc)
+MATE = 11 carbon g9a (density 1.926 g/cc) 
+MATE = 12 superconduction wire     
+MATE = 13 PCTFE     
+MATE = 14 stainless steel 316L    
+MATE = 15 NH3+He (density=0.836g/cc packing factor=0.653)         
+
+Output parameters:
+
+PIN(3) - 3-vector of particle momentum after absorber.
+
+LOSS (integer) - return status:
+
+LOSS = 1 normal completion
+LOSS = 0 unknown material
+LOSS = -1 momentum out of range
+
+If LOSS is not equal to 1, then PIN=POUT, no energy correction.
+
+If you need other materials, let me know, I'll put them in.  
+
+---------------
+
+There is a Makefile in this package. Run 'make lib' and it will build
+eloss library. Then you can link it with your program.
+
+Any bug reports or suggestions are welcome.
+
+Eugene Pasyuk
+(pasyuk@jlab.org)

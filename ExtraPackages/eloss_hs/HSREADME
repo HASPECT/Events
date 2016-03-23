@@ -1,0 +1,11 @@
+#Should compile with just ROOTSYS set
+#Enter directory and type make
+make
+#You can then load the library in ROOT sessions :
+setenv ELOSS $PWD
+#
+root
+gSystem->Load("$ELOSS/libeloss");
+##in case you want to run classes in ROOT which use eloss you also need
+gInterpreter->AddIncludePath("$ELOSS");
+#see for example Projects/g11SimtoHS
