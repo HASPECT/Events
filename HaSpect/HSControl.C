@@ -9,16 +9,32 @@
 //Set PROOF parameters
 //Set entrylist if required
 
-TProof* HSControl(Bool_t UsePROOF=kFALSE){
+TProof* HSControl(Bool_t UsePROOF=kFALSE,Bool_t RECompile=kTRUE){
   //////////////Set path to THSParticle.h etc.
   TString HSANA=gSystem->Getenv("HSANA");
   gInterpreter->AddIncludePath(HSANA);
   gEnv->SetValue("Unix.*.Root.MacroPath:",TString(".:")+HSANA);
   //make uptodate version of the classes once, in proof just load them (+ compared to ++)
-  gROOT->LoadMacro(HSANA+"/THSParticle.C++");
-  gROOT->LoadMacro(HSANA+"/THSHisto.C++");
-  gROOT->LoadMacro(HSANA+"/THSOutput.C++");
-  gROOT->LoadMacro(HSANA+"/THSEventWeighter.C++");
+  if(RECompile){
+    gROOT->LoadMacro(HSANA+"/THSParticle.C++");
+    gROOT->LoadMacro(HSANA+"/THSHisto.C++");
+    gROOT->LoadMacro(HSANA+"/THSOutput.C++");
+    gROOT->LoadMacro(HSANA+"/THSEventWeighter.C++");
+    gROOT->LoadMacro(HSANA+"/THSLongPS.C++");
+    gROOT->LoadMacro(HSANA+"/THSBins.C++");
+    gROOT->LoadMacro(HSANA+"/THSEventsPDF.C++");
+    gROOT->LoadMacro(HSANA+"/THSRooFit.C++");
+ }
+  else{
+    gROOT->LoadMacro(HSANA+"/THSParticle.C+");
+    gROOT->LoadMacro(HSANA+"/THSHisto.C+");
+    gROOT->LoadMacro(HSANA+"/THSOutput.C+");
+    gROOT->LoadMacro(HSANA+"/THSEventWeighter.C+");
+    gROOT->LoadMacro(HSANA+"/THSLongPS.C+");
+    gROOT->LoadMacro(HSANA+"/THSBins.C+");
+    gROOT->LoadMacro(HSANA+"/THSEventsPDF.C+");
+    gROOT->LoadMacro(HSANA+"/THSRooFit.C+");
+  }
    ////////////////////////////////////////////////
   
   TProof *plite=0;
@@ -33,6 +49,7 @@ TProof* HSControl(Bool_t UsePROOF=kFALSE){
      plite->Load(HSANA+"/THSHisto.C+");
      plite->Load(HSANA+"/THSOutput.C+");
      plite->Load(HSANA+"/THSEventWeighter.C+");
+     plite->Load(HSANA+"/THSLongPS.C+");
    }
    return plite;
 }
