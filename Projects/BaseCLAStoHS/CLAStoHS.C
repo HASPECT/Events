@@ -77,9 +77,9 @@ Bool_t CLAStoHS::Process(Long64_t entry)
    if(!IsGoodEventGhosts()) return kTRUE; //not the event we want so exit
    //check for a good photon
    GetEventPartBranches(entry); //get just the branches required
-   //look for photons in 1.5ns window, note 2ns looks a bit too large a window
+   //look for photons in 2.0ns window, note 2ns looks a bit too large a window
    //first arguement is centre position, 2nd is window (half size)
-   if(!MakeBeam(0,1.5)) return kTRUE;
+   if(!MakeBeam(0,2.0)) return kTRUE;
    //now arrange the detected particles into THSParticles
    MakeDetected();
 
@@ -150,7 +150,8 @@ Bool_t CLAStoHS::IsGoodEventGhosts(){
   vector<Int_t>EventState;
   Int_t nreal=0;
   for(UInt_t ifs=0;ifs<gpart;ifs++) {
-    if(stat[ifs]>0) {EventState.push_back(id[ifs]);nreal++;}
+       if(stat[ifs]>0) {fID[ifs]=ParticleID(ifs);EventState.push_back(fID[ifs]);nreal++;}
+       else {fID[ifs]=0;}
   }
   if(nreal!=(Int_t)fNdet) return kFALSE;//only analyse event with correct final state
     //put in order for comparison with requested fFinalState
@@ -165,10 +166,10 @@ void CLAStoHS::MakeDetected(){
  //this function controls the interfaciing of the reconstructed data to THSParticles
   Int_t iIDall[gpart]; //array containing order of particle IDs in id array for all tracks (incl ghosts) 
   Int_t iID[fNdet]; //array containing order of particle IDs in id array for "real" tracks
-  TMath::Sort((Int_t)gpart,id,iIDall,kFALSE); //order the array in asscending order(kFALSE), e.g. -211,211,211
+  TMath::Sort((Int_t)gpart,fID,iIDall,kFALSE); //order the array in asscending order(kFALSE), e.g. -211,211,211
   //write only the indexes of the real tracks to the ID array
   UInt_t Ndet=0;
-  for(Int_t ireal=0;ireal<gpart;ireal++) if(stat[iIDall[ireal]]>0)iID[Ndet++]=iIDall[ireal];
+   for(Int_t ireal=0;ireal<gpart;ireal++) if(stat[iIDall[ireal]]>0)iID[Ndet++]=iIDall[ireal];
  //the ordering in iID[] should now match fFinalState and fEventSate
   //loop over different particle types
   Ndet=0;
@@ -232,4 +233,27 @@ void CLAStoHS::GetEventPartBranches(Int_t evi){
   b_tag_energy->GetEvent(evi);
   b_dt_st_tag->GetEvent(evi);
   b_vertex_time->GetEvent(evi);
+}
+
+Int_t  CLAStoHS::ParticleID(Int_t itrk){
+  //Choose a particle ID method
+  return h10ID(itrk); // Use the h10 ntuple EVNT bank ID
+  // return MassID(itrk); // Use the h10 ntuple EVNT bank ID
+
+}
+Int_t  CLAStoHS::h10ID(Int_t itrk){
+ // Use the h10 ntuple EVNT bank ID
+  return id[itrk]; 
+}
+Int_t  CLAStoHS::MassID(Int_t itrk){
+  b_m->GetEntry(fEntry);//get the mass for this event
+ // Use the h10 ntuple EVNT mass
+  double mass2_limits[]={0,0.15,0.4,1.44,1E10}; //define mass^2 ranges for particles
+  int mass_pdg[]={11,211,321,2212,0};    //PDG id corresponding to mass2_limit
+  Int_t ip=0;
+  while(m[itrk]>=mass2_limits[ip]) ip++;
+
+  Int_t tid=mass_pdg[ip]*TMath::Sign(1,id[itrk]);  //sign of id= charge
+  // cout<<itrk<<" "<<tid<<" "<<mass_pdg[ip]<<" "<<m[itrk]<<" "<<endl;
+  return tid;
 }

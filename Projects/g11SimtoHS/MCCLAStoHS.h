@@ -1,32 +1,36 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jun  2 15:22:29 2014 by ROOT version 5.34/14
-// from TTree h10/PART
-// found on file: /home/dglazier/Work/Research/HaSpect/data/pippippimMn/ntpd_43582_pass1.one-third-of-full.pippippimMn.root
+// Tue Feb  9 09:32:15 2016 by ROOT version 5.34/28
+// from TTree h10/All_out
+// found on file: /home/dglazier/Dropbox/g11sim/g11_pipi2/g11_pipi21100.bos.evt.recsis.root
 //////////////////////////////////////////////////////////
 
-#ifndef CLAStoHS_h
-#define CLAStoHS_h
+#ifndef MCCLAStoHS_h
+#define MCCLAStoHS_h
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
-//#include <TLorentzVector.h>
 #include <TSelector.h>
-#include <iostream>
-
 #include "THSOutput.h"
+#include <vector>
+#include <map>
 
+typedef map< Int_t , TH2* > IntTH2_Map;
+typedef vector<Double_t> vDouble;
 // Header file for the classes stored in the TTree if any.
+#ifdef __CINT__
+#pragma link C++ class std::vector<TLorentzVector>+;
+#endif
+
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
-class CLAStoHS : public TSelector, public  THSOutput {
-  //private:
+class MCCLAStoHS : public TSelector, public THSOutput {
   //Additional ouput branches
   THSParticle* fHSgamma;  //the photon beam
   TLorentzVector* fMissing; // The missing 4-vector
-  //public:
+   //public:
   //Functions used to process data
   void GetEventPartBranches(Int_t evi);         //get the required branches
   void MakeParticle(THSParticle* hsp,Int_t ip); //convert to THSParticle using index ip e.g. cx[ip] etc.
@@ -39,6 +43,44 @@ class CLAStoHS : public TSelector, public  THSOutput {
   Int_t MassID(Int_t);                          // TrackID : from track mass, user needs to supply limits
 
   Int_t fID[100];                              //user-defined ID, watch out of you have more than 100 tracks... 
+
+  void MakeDetectedMC();
+  Bool_t CheckMCTruth();
+  void GetEventMCBranches(Int_t evi);
+  void MCCorrections();
+Double_t  Correct_MCTrackMomentum(Int_t pdg,TLorentzVector p4);
+  vector<TLorentzVector>  fMCParticle;
+  Int_t fMCOK;
+  vector< pair<Int_t, TString> > fTypeNames;
+//vector< pair<Int_t, Int_t> > fTypeIndex;
+  TLorentzVector *fp4rec;
+  TLorentzVector *fp4true;
+//vector<TH2F*> fMCCorr;
+  IntTH2_Map fMCCorr;
+
+
+//AMpTools branches
+  Double_t AddATBranches(Bool_t wipe=kFALSE);
+  Double_t doAT();//get kinematics from LorentzVectors for storing
+  Double_t doATtr();//and for MC truth values
+  Double_t AddATtrBranches();
+  TString fStrMiss;
+  Int_t fMissPDG;
+
+  Int_t fNAT;
+  Double_t* fATE;
+  Double_t* fATPx;
+  Double_t* fATPy;
+  Double_t* fATPz;
+  Double_t* fATPdg;
+  Double_t* fATtrE;
+  Double_t* fATtrPx;
+  Double_t* fATtrPy;
+  Double_t* fATtrPz;
+  Double_t* fATtrPdg;
+  Double_t fATEb;
+  Double_t fATtrEb;
+
 
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -117,13 +159,6 @@ public :
    Float_t         sc_t[20];   //[sc_part]
    Float_t         sc_r[20];   //[sc_part]
    Float_t         sc_c2[20];   //[sc_part]
-   Int_t           st_part;
-   Int_t           st_sector[20];   //[st_part]
-   Int_t           st_ihit[20];   //[st_part]
-   Int_t           st_trkno[20];   //[st_part]
-   Float_t         st_time[20];   //[st_part]
-   Float_t         st_rtrk[20];   //[st_part]
-   Int_t           st_status[20];   //[st_part]
    Int_t           taghit;
    Float_t         E_gamma[30];   //[taghit]
    Float_t         T_gamma_norf[30];   //[taghit]
@@ -180,6 +215,16 @@ public :
    Float_t         cyymvrt;
    Float_t         cyzmvrt;
    Int_t           stamvrt;
+   Int_t           mcnentr;
+   UChar_t         mcnpart;
+   Float_t         mcw;
+   Int_t           mcst[20];   //[mcnentr]
+   Int_t           mcid[20];   //[mcnentr]
+   Int_t           mcpid[20];   //[mcnentr]
+   Float_t         mctheta[20];   //[mcnentr]
+   Float_t         mcphi[20];   //[mcnentr]
+   Float_t         mcp[20];   //[mcnentr]
+   Float_t         mcm[20];   //[mcnentr]
    Int_t           nprt;
    Int_t           pidpart[20];   //[nprt]
    Float_t         xpart[20];   //[nprt]
@@ -236,6 +281,9 @@ public :
    Int_t           scstat[20];   //[nschit]
    Float_t         scde[20];   //[nschit]
    Float_t         scdt[20];   //[nschit]
+  //data members for new branches
+  //you must define how they are processed for each event
+  //e.g.   TLorentzVector  *fp1;
 
    // List of branches
    TBranch        *b_run_num;   //!
@@ -311,13 +359,6 @@ public :
    TBranch        *b_sc_t;   //!
    TBranch        *b_sc_r;   //!
    TBranch        *b_sc_c2;   //!
-   TBranch        *b_st_part;   //!
-   TBranch        *b_st_sector;   //!
-   TBranch        *b_st_ihit;   //!
-   TBranch        *b_st_trkno;   //!
-   TBranch        *b_st_time;   //!
-   TBranch        *b_st_rtrk;   //!
-   TBranch        *b_st_status;   //!
    TBranch        *b_taghit;   //!
    TBranch        *b_E_gamma;   //!
    TBranch        *b_T_gamma_norf;   //!
@@ -374,6 +415,16 @@ public :
    TBranch        *b_cyymvrt;   //!
    TBranch        *b_cyzmvrt;   //!
    TBranch        *b_stamvrt;   //!
+   TBranch        *b_mcnentr;   //!
+   TBranch        *b_mcnpart;   //!
+   TBranch        *b_mcw;   //!
+   TBranch        *b_mcst;   //!
+   TBranch        *b_mcid;   //!
+   TBranch        *b_mcpid;   //!
+   TBranch        *b_mctheta;   //!
+   TBranch        *b_mcphi;   //!
+   TBranch        *b_mcp;   //!
+   TBranch        *b_mcm;   //!
    TBranch        *b_nprt;   //!
    TBranch        *b_pidpart;   //!
    TBranch        *b_xpart;   //!
@@ -431,11 +482,8 @@ public :
    TBranch        *b_scde;   //!
    TBranch        *b_scdt;   //!
 
-   //fOutName - if directory will fill with filtered files of the same name as input
-   //fOutName - if full filename will just fill the single file with output of all input
-    CLAStoHS(TTree * /*tree*/ =0) : THSOutput(), fHSgamma(0), fMissing(0), fChain(0) { }
-   //CLAStoHS(TTree * /*tree*/ =0) : THSOutput(), fHSgamma(0), fMissing(0), fChain(0) { fOutName="/home/dglazier/Work/Research/HaSpect/data/pippippimMn_HS2/OneFile.root";}
-   virtual ~CLAStoHS();
+ MCCLAStoHS(TTree * /*tree*/ =0) :THSOutput(), fHSgamma(0), fMissing(0), fMCParticle(0),fp4rec(0), fp4true(0),fATE(0),fATPx(0),fATPy(0),fATPz(0),fATPdg(0),fATtrE(0),fATtrPx(0),fATtrPy(0),fATtrPz(0),fATtrPdg(0),fChain(0) { }
+   virtual ~MCCLAStoHS();
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
    virtual void    SlaveBegin(TTree *tree);
@@ -449,14 +497,17 @@ public :
    virtual TList  *GetOutputList() const { return fOutput; }
    virtual void    SlaveTerminate();
    virtual void    Terminate();
+//Add THSHisto functions
+   virtual void HistogramList(TString sLabel);
+   virtual void FillHistograms(TString sCut,Int_t bin);
 
-   ClassDef(CLAStoHS,0);
+   ClassDef(MCCLAStoHS,0);
 };
 
 #endif
 
-#ifdef CLAStoHS_cxx
-void CLAStoHS::Init(TTree *tree)
+#ifdef MCCLAStoHS_cxx
+void MCCLAStoHS::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -544,13 +595,6 @@ void CLAStoHS::Init(TTree *tree)
    fChain->SetBranchAddress("sc_t", sc_t, &b_sc_t);
    fChain->SetBranchAddress("sc_r", sc_r, &b_sc_r);
    fChain->SetBranchAddress("sc_c2", sc_c2, &b_sc_c2);
-   fChain->SetBranchAddress("st_part", &st_part, &b_st_part);
-   fChain->SetBranchAddress("st_sector", st_sector, &b_st_sector);
-   fChain->SetBranchAddress("st_ihit", st_ihit, &b_st_ihit);
-   fChain->SetBranchAddress("st_trkno", st_trkno, &b_st_trkno);
-   fChain->SetBranchAddress("st_time", st_time, &b_st_time);
-   fChain->SetBranchAddress("st_rtrk", st_rtrk, &b_st_rtrk);
-   fChain->SetBranchAddress("st_status", st_status, &b_st_status);
    fChain->SetBranchAddress("taghit", &taghit, &b_taghit);
    fChain->SetBranchAddress("E_gamma", E_gamma, &b_E_gamma);
    fChain->SetBranchAddress("T_gamma_norf", T_gamma_norf, &b_T_gamma_norf);
@@ -607,6 +651,16 @@ void CLAStoHS::Init(TTree *tree)
    fChain->SetBranchAddress("cyymvrt", &cyymvrt, &b_cyymvrt);
    fChain->SetBranchAddress("cyzmvrt", &cyzmvrt, &b_cyzmvrt);
    fChain->SetBranchAddress("stamvrt", &stamvrt, &b_stamvrt);
+   fChain->SetBranchAddress("mcnentr", &mcnentr, &b_mcnentr);
+   fChain->SetBranchAddress("mcnpart", &mcnpart, &b_mcnpart);
+   fChain->SetBranchAddress("mcw", &mcw, &b_mcw);
+   fChain->SetBranchAddress("mcst", mcst, &b_mcst);
+   fChain->SetBranchAddress("mcid", mcid, &b_mcid);
+   fChain->SetBranchAddress("mcpid", mcpid, &b_mcpid);
+   fChain->SetBranchAddress("mctheta", mctheta, &b_mctheta);
+   fChain->SetBranchAddress("mcphi", mcphi, &b_mcphi);
+   fChain->SetBranchAddress("mcp", mcp, &b_mcp);
+   fChain->SetBranchAddress("mcm", mcm, &b_mcm);
    fChain->SetBranchAddress("nprt", &nprt, &b_nprt);
    fChain->SetBranchAddress("pidpart", pidpart, &b_pidpart);
    fChain->SetBranchAddress("xpart", xpart, &b_xpart);
@@ -665,19 +719,17 @@ void CLAStoHS::Init(TTree *tree)
    fChain->SetBranchAddress("scdt", scdt, &b_scdt);
 }
 
-Bool_t CLAStoHS::Notify()
+Bool_t MCCLAStoHS::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
    // is started when using PROOF. It is normally not necessary to make changes
    // to the generated code, but the routine can be extended by the
    // user if needed. The return value is currently not used.
-   //cleanup previouos file
-   //Use THSOutput functions to look after files
-  THSOutput::HSNotify(fChain);
+   THSOutput::HSNotify(fChain);
   THSOutput::InitOutTree();
-
+ 
    return kTRUE;
 }
 
-#endif // #ifdef CLAStoHS_cxx
+#endif // #ifdef MCCLAStoHS_cxx
