@@ -6,7 +6,7 @@
 #include "RooStats/SPlot.h"
 #include "RooFitResult.h"
 #include <TNamed.h>
-#include <TChain .h>
+#include <TChain.h>
 #include <TCanvas.h>
 #include <TList.h>
 #include <TFile.h>
