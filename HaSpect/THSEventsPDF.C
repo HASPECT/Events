@@ -20,6 +20,7 @@ THSEventsPDF::THSEventsPDF(const char *name, const char *title,
 			   RooAbsReal& _alpha,
 			   RooAbsReal& _offset,
 			   RooAbsReal& _scale,
+			   Int_t NBins ,
 			   Int_t NAlphBins  ) :
   RooAbsPdf(name,title), 
   x("x","x",this,_x),
@@ -48,16 +49,16 @@ THSEventsPDF::THSEventsPDF(const char *name, const char *title,
   else cout<<"THSEventsPDF::THSEventsPDF Warning no scale minimum set take = 1"<<endl;
   Double_t mid=(rx->getMax()+rx->getMin())/2;
   Double_t diff=(rx->getMax()-rx->getMin())/2;
-  Double_t rMin=mid-diff/rsmin - ro->getMin(); //additional range for possible tranformation or scaling
+  Double_t rMin=mid-diff/rsmin + ro->getMin(); //additional range for possible tranformation or scaling
   Double_t rMax=mid+diff/rsmin + ro->getMax();
-  Int_t NbinX=200/rsmin;
-  cout<<GetName()<<" hist ranges "<<rMin<<" to "<<rMax<<endl;
+  Int_t NbinX=NBins/rsmin;
+  cout<<GetName()<<" THSEventsPDF::THSEventsPDF  hist ranges "<<rMin<<" to "<<rMax<<endl;
   if(NbinX<10) NbinX=10;
    fRHist=new TH2F(TString("hmc_model_")+_x.GetName()+name,TString("MC model for ")+_x.GetName(),NbinX,rMin,rMax,NAlphBins,ra->getMin(),ra->getMax());
   fRHist->Sumw2();
   //  fRHist=new TH2F(TString("hmc_model_")+_x.GetName()+name,TString("MC model for ")+_x.GetName(),NbinX,rx->getMin(),rx->getMax(),NAlphBins,ra->getMin(),ra->getMax());
-  fx=new RooRealVar(_x.GetName(),"Vx",0,x.min(),x.max());
-  fx_off=new RooRealVar(_x.GetName(),"Vx_off",0,rMin,rMax);
+  fx=new RooRealVar(_x.GetName(),"Vx",mid,x.min(),x.max());
+  fx_off=new RooRealVar(_x.GetName(),"Vx_off",mid,rMin,rMax);
   falpha=new RooRealVar("Valpha","Valpha",0,alpha.min(),alpha.max());
   
   fNWdim=0;
@@ -80,7 +81,7 @@ THSEventsPDF::THSEventsPDF(const THSEventsPDF& other, const char* name) :
   fTree(0)
 { 
   
-  //  cout<<"Copy contructor "<<fHistPdf<<" "<<other.fHistPdf<<endl;
+  // cout<<"Copy contructor "<<fHistPdf<<" "<<other.fHistPdf<<endl;
   if(other.fx_off)fx_off=(RooRealVar*)other.fx_off->Clone();
   if(other.fx)fx=(RooRealVar*)other.fx->Clone();
   if(other.falpha)falpha=(RooRealVar*)other.falpha->Clone();
@@ -99,7 +100,7 @@ THSEventsPDF::~THSEventsPDF() {
   if(fHist)delete fHist; 
   if(fRHist)delete fRHist; 
   if(fx_off) delete fx_off;
- if(fx) delete fx;
+  if(fx) delete fx;
   if(falpha)delete falpha;
   if(fHistPdf) delete fHistPdf;
   if(fWeightHist) delete fWeightHist;
@@ -117,9 +118,10 @@ Double_t THSEventsPDF::evaluate() const
   falpha->setVal(Double_t(alpha));
   // return  fHist->weight(RooArgSet(*fx_off,*falpha),1,kTRUE)*TMath::Gaus(offset,0,(offset.max()-offset.min())*0.2); //Guassian prior with width  1/5*range 
   return  fHist->weight(RooArgSet(*fx_off,*falpha),1,kTRUE);//*TMath::Gaus(scale,1.,1);
+ // return  fHist->weight(RooArgSet(*fx_off,*falpha),1,kTRUE)*TMath::Gaus(Double_t(alpha),0,alpha.max()/2);//alpha prior with width half the range
 } 
 
-void THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
+Long64_t THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
   //Construcnt a RooDataHist with MC data
   //y axis incorporates systematic uncertaintly on width of distribution
   //tree contains the MC events, 
@@ -191,7 +193,9 @@ void THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
     }
   }
   TTree* FastTree=fTree->CopyTree("");//make sure only loop over valid events for speedi.e. this enforces Elist
-  cout<<GetName()<<" THSEvent final entries "<<FastTree->GetEntries()<<endl;
+  Long64_t NFT=FastTree->GetEntries();
+  cout<<GetName()<<" THSEvent final entries "<<NFT<<endl;
+  if(FastTree->GetEntries()==0) return 0;
   for(Int_t ia=0;ia<fRHist->GetNbinsY();ia++){ 
     temph->Reset();
     Long64_t treeEntry=0;
@@ -202,8 +206,8 @@ void THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
     //   treeEntry = Elist->GetEntryAndTree(itr,treenum);
     //   if(chain) treeEntry+=chain->GetTreeOffset()[treenum];
     //  tree->GetEntry(treeEntry);
-    for(Int_t itr=0;itr<FastTree->GetEntries();itr++){
-      tree->GetEntry(itr);
+    for(Int_t itr=0;itr<NFT;itr++){
+      FastTree->GetEntry(itr);
       Double_t weight=1;
       if(fNWdim==1)weight=GetDistWeight(wVal[0]);
       else if(fNWdim==2)weight=GetDistWeight(wVal[0],wVal[1]);
@@ -238,7 +242,6 @@ void THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
 
   fHist = new RooDataHist(fRHist->GetName(),fRHist->GetName(),RooArgSet(*fx_off,*falpha),RooFit::Import(*fRHist));
   //create pdf for getting analytical integral
-  //fHistPdf = new RooHistPdf(TString("PDF")+fRHist->GetName(),TString("PDF")+fRHist->GetName(),RooArgSet(*fx_off,*falpha),*fHist,1); 
   fHistPdf = new RooHistPdf(TString("PDF")+fRHist->GetName(),TString("PDF")+fRHist->GetName(),RooArgSet(*fx_off,*falpha),RooArgSet(*fx,*falpha),*fHist,1); 
   delete temph;
   tree->SetEntryList(0); //detach entry list
@@ -247,10 +250,12 @@ void THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
   tree->ResetBranchAddresses();
   if(chain){chain->ResetBranchAddresses();chain->GetStatus()->Clear();}
   if(FastTree) delete FastTree;
-  return;
+  delete fTree;
+  fTree=0;
+  return NFT;
 }
 Int_t THSEventsPDF::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars,const char* rangeName) const
-{   //return 0; //might be good to check numerical integral sometimes
+{  return 0; //might be good to check numerical integral sometimes
    return fHistPdf->getAnalyticalIntegral(allVars,analVars);
 }
 Double_t THSEventsPDF::analyticalIntegral(Int_t code,const char* rangeName) const

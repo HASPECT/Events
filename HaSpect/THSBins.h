@@ -11,45 +11,46 @@
 #include <iostream>
 using namespace std;
 
-//typedef vector<Double_t> VecDouble_t;
 typedef vector<TString> VecString_t;
 typedef vector<TAxis> VecAxis_t;
-#pragma link C++ typedef vector<TAxis> VecAxis_t+;
-#pragma link C++ typedef vector<TString> VecString_t+;
 
 class THSBins : public TNamed{
  protected:
   
-  VecString_t fBinNames; //names of individual bins
-  Int_t fNbins;
-  Int_t fNaxis;
+  TTree* fBinTree;
+  VecString_t fBinNames;//names of individual bins
   VecAxis_t fVarAxis;//bin limits for variables
-  TObjArray *fEntryLists;
-  TObjArray *fTrees;
-  TFile* fFile;
+  TFile* fFile;//! file for writing lists to disc in case they get large
+  Int_t fNbins;//number of bins
+  Int_t fNaxis;//number of axis
+  Int_t fBin;//number of axis
 
  public:
- THSBins() : fEntryLists(0),fTrees(0),fFile(0) {fNaxis=0;fNbins=0;};
+ THSBins() : fBinTree(0),fFile(0),fNaxis(0),fNbins(0) {};
+  THSBins(TString name,TString filename);
   THSBins(const THSBins& other, const char* name=0);
 
- THSBins(TString name) :TNamed(name,name),fEntryLists(0),fTrees(0),fFile(0) {fNaxis=0;fNbins=0;};
-  ~THSBins(){if(fFile){delete fFile;}delete fEntryLists;delete fTrees;fVarAxis.clear();};
+  THSBins(TString name);
+  ~THSBins();
 
   virtual TObject* Clone(const char* newname="") const { return new THSBins(*this,newname); }
 
-  void InitialiseLists(TString name="HSBinsEntryList",TString filename="");
-  void InitialiseTrees(TString name="HSBinsTree",TString filename="");
   void AddAxis(TString name,Int_t nbins,Double_t min,Double_t max);
+  void AddAxis(TString name,Int_t nbins,Double_t* xbins);
   void IterateAxis(Int_t iA,TString binName);
+  VecString_t GetBinNames(){return fBinNames;}
+  VecAxis_t GetVarAxis(){return fVarAxis;}
   TString GetBinName(Int_t i){if(i<fNbins) return fBinNames[i];else return "";};
-  TEntryList* GetEntryList(Int_t i){return dynamic_cast<TEntryList*>(fEntryLists->At(i));}
-  TObjArray* GetEntryLists(){return fEntryLists;}
-  void SaveLists();
-  void SaveTrees();
-  void RunEntryList(TTree* tree);
-  void RunTree(TTree* tree);
+  void InitialiseBinTree(TString name,TString filename);
+  void Save();
+  void RunBinTree(TTree* tree);
+  TTree* GetBinTree(){return fBinTree;}
+  TTree* GetBinnedTree(TTree* tree,Int_t bin);
   Int_t GetN(){return fNbins;}
-  ClassDef(THSBins, 0)  // Writeable bins class
+  Int_t GetNAxis(){return fNaxis;}
+  void PrintAxis();
+  ClassDef(THSBins, 1)  // Writeable bins class
 };
+
 #endif //ifdef THSBINS
 

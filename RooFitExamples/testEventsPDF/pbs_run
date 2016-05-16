@@ -1,0 +1,45 @@
+#!/bin/tcsh
+#PBS -N HASPECT_SW
+#PBS -m abe 
+#PBS -M Derek.Glazier@glasgow.ac.uk
+#PBS -l walltime=100:00:00
+#PBS -V
+
+#Make a directory to work in
+#!!!!!You will need to change this to something sensible!
+mkdir -p /home/dglazier/$JOBNAME
+cd /home/dglazier/$JOBNAME
+
+echo ' analysing bin ' $JOBNAME
+echo $HOST
+
+#set env variables
+setenv INPUT "Farm"$JOBNAME".root"
+setenv LOG "Farm"$JOBNAME".log"
+
+#copy data and analysis files
+cp $FILEDIR/$INPUT .
+cp $RUNMAC .
+
+cp $HSANA/../RooFitExamples/testSimple/THSRooFit.* .
+cp $HSANA/../RooFitExamples/testSimple/THSBins.* .
+cp $HSANA/../RooFitExamples/testSimple/THSWeights.* .
+
+ls -lh 
+#run job in root batch mode
+#root -b -q 'HSRunBatchSW.C(TString(gSystem->Getenv("JOBNAME")))' >& $LOG
+root -b -q 'HSRunBatchSW.C(TString(gSystem->Getenv("JOBNAME")))' 
+
+#copy output files to destination
+cp Plots* $FILEDIR/.
+cp Weights* $FILEDIR/.
+cp $LOG $FILEDIR/.
+
+
+#tidy up
+cd ../
+rm -r $JOBNAME
+
+echo 'all done and tidied up'
+
+

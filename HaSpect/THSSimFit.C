@@ -1,49 +1,45 @@
 #include "THSSimFit.h"
-#include </home/dglazier/Dropbox/hsana/Events/Projects/pipi/SPlotMC/THSEventsPDF.h>
+#include "THSEventsPDF.h"
 
 ClassImp(THSSimFit);
 THSSimFit::THSSimFit() : THSRooFit(){
-  fIsBinTrees=kFALSE;
-}
+  fAccFrac=0.005;
+ }
 void THSSimFit::SetModelEventsTree(TString name,TTree* tree){
+  //Note fit varibale not added to bins here as we want a wider ranges
+  //for our PDF in case of offsets or scaling
   THSEventsPDF* mpdf=dynamic_cast<THSEventsPDF*>(fWS->pdf(name));
    mpdf->SetTree(tree);//set the tree for the MC model
-   cout<< "THSRooFit::SetMCModelTree(TString name,TTree* tree) "<<name<<endl;
- 
+   cout<< "THSSimFit::SetMCModelTree(TString name,TTree* tree) "<<name<<" "<<endl;
+
    //if bins are defined split tree up into bins 
-   if(fDataBins&&!fIsBinTrees){//use either entrylists
-     fDataBins->InitialiseLists("MCModelBins",fOutDir+TString("Bins")+mpdf->GetName()+".root");
-     fDataBins->RunEntryList(tree);
-     fDataBins->SaveLists();
-     
+   if(fDataBins){//use either entrylists
+      fDataBins->InitialiseBinTree("MCModelBins",fOutDir+TString("Bins")+mpdf->GetName()+".root");
+      fDataBins->RunBinTree(tree);
+      fDataBins->Save();
    }
-   else if(fDataBins){//or trees
-       fDataBins->InitialiseTrees("MCModelBins",fOutDir+TString("Bins")+mpdf->GetName()+".root");
-       fDataBins->RunTree(tree);
-       fDataBins->SaveTrees();
-     }
-   else mpdf->AddSmearedModel(0,GetAuxVars());//only one bin, go ahead and make the model, with ranges defined in aux vars
+
+   //else mpdf->AddSmearedModel(0,GetAuxVars());//only one bin, go ahead and make the model, with ranges defined in aux vars
 }
-void THSSimFit::RunWeights(){
-  if(!fDataBins) THSRooFit::RunWeights();
-  else{
-    if(fIsBinTrees) RunWithTrees();
-    else RunWithBins();
-  }
-}
-void THSSimFit::RunWithBins(){
+void THSSimFit::RunWithBins(Int_t Nbins){
+  DefineSets();
   MakeBins();
   cout<<"THSSimFit::RunWithBins(); number of bins "<<fDataBins->GetN()<<endl;
   TDirectory *saveDir=gDirectory;
-  TFile* tfile=new TFile(fOutDir+"DataEntries.root");
-  saveDir->cd();
-  TObjArray* oa=(TObjArray*)tfile->Get("DataBins");
+  THSBins* savedBins=new THSBins("HSDataBins",fOutDir+"DataEntries.root");
+  fTree->SetBranchStatus("*",0);
+  for(Int_t i=0;i<fVariables.getSize();i++){//only copy variable branches for speed
+    fTree->SetBranchStatus(fVariables[i].GetName(),1);
+  }
+  //but always need ID branch
+  if(fTree->GetBranch(fIDBranchName)){
+   fTree->SetBranchStatus(fIDBranchName,1);
+  }
+  Long64_t PdfN[GetPDFs().getSize()];
+  Long64_t TotalN=0;
+ 
   for(Int_t i=0;i<fDataBins->GetN();i++){
-    TEntryList* DataList=dynamic_cast<TEntryList*>(oa->At(i));
-    fTree->SetEntryList(DataList);
-    // THSRooFit* rf=CreateSubFitBins(TNamed(fDataBins->GetBinName(i),TString("")));
-    THSRooFit* rf=CreateSubFitBins(fTree);
-    rf->SetName(fDataBins->GetBinName(i));
+    THSRooFit* rf=CreateSubFitBins(savedBins->GetBinnedTree(fTree,i),kFALSE);
     //iterate over models and set their entry lists id THSEventsPdf
     RooAbsPdf* pdf=0;
     for(Int_t ip=0;ip<rf->GetPDFs().getSize();ip++){
@@ -51,93 +47,177 @@ void THSSimFit::RunWithBins(){
       THSEventsPDF* mpdf=0;
       cout<<"THSSimFit::RunWithBins(); PDFs "<<pdf->GetName()<<endl;
       if(mpdf=dynamic_cast<THSEventsPDF*>(pdf)){//Only applies to THSEventsPDF
-      	TFile* mfile=new TFile(fOutDir+TString("Bins")+mpdf->GetName()+".root");
-      	TObjArray* oam=(TObjArray*)mfile->Get("MCModelBins");
-      	//note the cloned entry list is deleted in THSEventsPDF
-       	mpdf->SetTree(dynamic_cast<THSEventsPDF*>(fPDFs.find(mpdf->GetName()))->GetTree());
-      	TEntryList* MCList=dynamic_cast<TEntryList*>(oam->At(i)->Clone());
-      	MCList->SetDirectory(0);
-      	mpdf->SetEntryList(MCList);
-      	mfile->Close();
-	delete oam;
-      	delete mfile;
-      	//COULD send it to the farm here
-      	mpdf->AddSmearedModel(0,rf->GetAuxVars());
+	THSBins* savedMCBins=new THSBins("MCModelBins",fOutDir+TString("Bins")+mpdf->GetName()+".root");
+  	mpdf->SetTree(savedMCBins->GetBinnedTree(dynamic_cast<THSEventsPDF*>(fPDFs.find(mpdf->GetName()))->GetTree(),i));
+	delete savedMCBins;
+       	PdfN[ip]=mpdf->AddSmearedModel(0,rf->GetAuxVars());
+	TotalN+=PdfN[ip];
+	if(PdfN[ip]<10) {
+	  cout<<"THSSimFitfrom::RunWithBins() no events found for "<<fDataBins->GetBinName(i)<<" MODEL: "<<pdf->GetName()<<" probably no events kinmatically allowed in this bin" <<endl;
+	  rf->GetPDFsp()->remove(rf->GetPDFs()[ip]);
+	  rf->GetYieldsp()->remove(*(rf->GetWorkSpace()->var(fYld+pdf->GetName())));
+	  rf->GetWorkSpace()->removeSet("Yields");
+	  rf->GetWorkSpace()->removeSet("PDFs");
+	  rf->GetWorkSpace()->defineSet("Yields",rf->GetYields());
+	  rf->GetWorkSpace()->defineSet("PDFs",rf->GetPDFs());
+	}
       }
     }
-     
-    if(!rf->GetModel()) rf->TotalPDF();
-    rf->Fit();
-    rf->PlotDataModel();
+    for(Int_t ip=0;ip<GetPDFs().getSize();ip++){
+      if(PdfN[ip]/TotalN<fAccFrac){
+	//  cout<<" THSSimFit::InitialiseFit()  "<<GetName()<<" MODEL: "<<GetPDFs()[ip]->GetName()<<" N events below acceptance fraction so not considered significant enough background " <<PdfN[ip] <<" out of "<<TotalN<<endl;
+	GetPDFsp()->remove(GetPDFs()[ip]);
+	GetYieldsp()->remove(*(GetWorkSpace()->var(fYld+pdf->GetName())));
+	GetWorkSpace()->removeSet("Yields");
+	GetWorkSpace()->removeSet("PDFs");
+	GetWorkSpace()->defineSet("Yields",GetYields());
+	GetWorkSpace()->defineSet("PDFs",GetPDFs());	
+	
+      }
+    }
+    if(rf->GetPDFs().getSize()) rf->TotalPDF();
+    else {
+      cout<<"THSSimFit::RunWithBins() no model found for "<<fDataBins->GetBinName(i)<<" probably no events kinmatically allowed in this bin" <<endl;
+      rf->RemoveDataSet();//save memory
+      delete rf;
+      continue;
+    }
+    cout<<fData->numEntries()<<endl;
+    if(rf->GetDataSet()->numEntries()<2) {delete rf;continue;}
+    rf->FitMany(Nbins);
     rf->sPlot();
-    rf->SavePlots(fOutDir+TString("Plots")+fDataBins->GetBinName(i)+".root");
-    AddWeightMap(rf->GetWeights()->GetMap());
+    rf->SavePlots("");//save plots for each bin fit
     rf->GetWeights()->PrintWeight();
+    AddWeightMap(rf->GetWeights());
+    rf->GetWeights()->Save();
     rf->RemoveDataSet();//save memory
     delete rf;
   }
-   tfile->Close();
-   delete oa;
-   delete tfile;
-
+  //tfile->Close();
+   delete savedBins;
+   //delete tfile;
+  fTree->SetBranchStatus("*",1);
   cout<<"THSRooFit::RunWithBins() Done all Fits "<<endl;
   // AddSubWeights();
   GetWeights()->PrintWeight();
-  ExportWeightsToFile(fOutDir+TString("Weights")+".root");
+  GetWeights()->SortWeights();
 }
-void THSSimFit::RunWithTrees(){
-  fWS->Print();
-  cout<<"THSRooFit::RunWithBins(); number of bins "<<fDataBins->GetN()<<endl;
-  MakeTreeBins();
-  TFile* tfile=new TFile(fOutDir+"DataEntries.root");
-  TObjArray* oa=(TObjArray*)tfile->Get("DataBins");
-  for(Int_t i=0;i<fDataBins->GetN();i++){
-    TTree* DataTree=dynamic_cast<TTree*>(oa->At(i));
-    THSRooFit* rf=CreateSubFitBins(DataTree);
-    //Make fit object for events in this bin
-    //retrieve from saved entries file
+
+void THSSimFit::PrepareForFarm(){
+  DefineSets();
+  MakeBins();
+  cout<<" THSSimFit::PrepareForFarm(); number of bins "<<fDataBins->GetN()<<endl;
+  TDirectory *saveDir=gDirectory;
+  THSBins* savedBins=new THSBins("HSDataBins",fOutDir+"DataEntries.root");
+  fTree->SetBranchStatus("*",0);
+  for(Int_t i=0;i<fVariables.getSize();i++){//only copy variable branches for speed
+    fTree->SetBranchStatus(fVariables[i].GetName(),1);
+  }
+  //but always need ID branch
+  if(fTree->GetBranch(fIDBranchName)){
+   fTree->SetBranchStatus(fIDBranchName,1);
+  }
+  Long64_t PdfN[GetPDFs().getSize()];
+  Long64_t TotalN=0;
+   for(Int_t i=0;i<fDataBins->GetN();i++){
+    THSRooFit* rf=CreateSubFitBins(savedBins->GetBinnedTree(fTree,i),kFALSE);
+    cout<<"THSSimFit::PrepareForFarm() made data for "<<fDataBins->GetBinName(i)<<" with entries =" <<rf->GetDataSet()->numEntries()<<endl;
+     //iterate over models and set their entry lists id THSEventsPdf
     RooAbsPdf* pdf=0;
-    //    while(pdf=(RooAbsPdf*)itPdf->Next()){
-    TTree* MCTree=0;
     for(Int_t ip=0;ip<rf->GetPDFs().getSize();ip++){
       pdf=(RooAbsPdf*)&(rf->GetPDFs()[ip]);
       THSEventsPDF* mpdf=0;
-      cout<<"THSRooFit::RunWithBins(); PDFs "<<pdf->GetName()<<endl;
+      cout<<" THSSimFit::PrepareForFarm(); PDFs "<<pdf->GetName()<<endl;
       if(mpdf=dynamic_cast<THSEventsPDF*>(pdf)){//Only applies to THSEventsPDF
-	TFile* mfile=new TFile(fOutDir+TString("Bins")+mpdf->GetName()+".root");
-	TObjArray* oam=(TObjArray*)mfile->Get("MCModelBins");
-	cout<<mfile<<" "<<oam<<endl;
-	//note the cloned entry list is deleted in THSEventsPDF
-	MCTree=dynamic_cast<TTree*>(oam->At(i)->Clone());
-	MCTree->SetDirectory(0);
-	//mpdf->SetEntryList(MCList);
-	mpdf->SetTree(MCTree);
-	mfile->Close();
-	delete oam;
-	delete mfile;
-	cout<<MCTree<<" "<<mpdf<<" "<<rf->GetAuxVars()<<endl;
-	//COULD send it to the farm here
-	mpdf->AddSmearedModel(0,rf->GetAuxVars());
-	//	mpdf->SetVarRange(TString(fExpLimits[il].GetName()).Remove(0,2))->setRange(fWS->var(fExpLimits[il].GetName())->getMin(),fWS->var(fExpLimits[il].GetName())->getMax());
-	delete MCTree;
+	THSBins* savedMCBins=new THSBins("MCModelBins",fOutDir+TString("Bins")+mpdf->GetName()+".root");
+	//Get tree for this bin
+  	mpdf->SetTree(savedMCBins->GetBinnedTree(dynamic_cast<THSEventsPDF*>(fPDFs.find(mpdf->GetName()))->GetTree(),i));
+      	PdfN[ip]=mpdf->AddSmearedModel(0,rf->GetAuxVars());
+	TotalN+=PdfN[ip];
+
+	if(PdfN[ip]<10) {
+	  cout<<" THSSimFit::InitialiseFit() no events found for "<<rf->GetName()<<" MODEL: "<<pdf->GetName()<<" probably no events kinmatically allowed in this bin" <<endl;
+	  rf->GetPDFsp()->remove(rf->GetPDFs()[ip]);
+	  rf->GetYieldsp()->remove(*(rf->GetWorkSpace()->var(fYld+pdf->GetName())));
+	  rf->GetWorkSpace()->removeSet("Yields");
+	  rf->GetWorkSpace()->removeSet("PDFs");
+	  rf->GetWorkSpace()->defineSet("Yields",rf->GetYields());
+	  rf->GetWorkSpace()->defineSet("PDFs",rf->GetPDFs());	
+	}
+	delete savedMCBins;
       }
     }
-    rf->TotalPDF();
-    rf->Fit();
-    rf->PlotDataModel();
-    rf->sPlot();
-    rf->SavePlots(fOutDir+TString("Plots")+fDataBins->GetBinName(i)+".root");
-    AddWeightMap(rf->GetWeights()->GetMap());
-    rf->GetWeights()->PrintWeight();
+    for(Int_t ip=0;ip<GetPDFs().getSize();ip++){
+      if(PdfN[ip]/TotalN<fAccFrac){
+	//  cout<<" THSSimFit::InitialiseFit()  "<<GetName()<<" MODEL: "<<GetPDFs()[ip]->GetName()<<" N events below acceptance fraction so not considered significant enough background " <<PdfN[ip] <<" out of "<<TotalN<<endl;
+	GetPDFsp()->remove(GetPDFs()[ip]);
+	GetYieldsp()->remove(*(GetWorkSpace()->var(fYld+pdf->GetName())));
+	GetWorkSpace()->removeSet("Yields");
+	GetWorkSpace()->removeSet("PDFs");
+	GetWorkSpace()->defineSet("Yields",GetYields());
+	GetWorkSpace()->defineSet("PDFs",GetPDFs());	
+	
+      }
+    }
+    //also need to import custom PDF class
+    rf->GetWorkSpace()->importClassCode(THSEventsPDF::Class(),kTRUE);
+    rf->GetWorkSpace()->writeToFile(fOutDir+TString("Farm")+fDataBins->GetBinName(i)+".root");
+    cout <<" THSSimFit::PrepareForFarm() Saved Workspace with "<<rf->GetDataSet()->numEntries()<<" for bin "<<fDataBins->GetBinName(i)<<endl;
     rf->RemoveDataSet();//save memory
     delete rf;
   }
-   tfile->Close();
-   delete oa;
-   delete tfile;
+  delete savedBins;
 
-  cout<<"THSRooFit::RunWithBins() Done all Fits "<<endl;
-  //AddSubWeights();
-  GetWeights()->Print();
-  ExportWeightsToFile(fOutDir+TString("Weights")+".root");
+  cout<<"THSRooFit::PrepareForFarm() Done all files "<<endl;
+ }
+
+
+Bool_t THSSimFit::InitialiseFit(){
+  if(GetDataSet()->numEntries()<2) {cout<<" THSSimFit::InitialiseFit() less than 2 entries in dataset!"<<endl; return kFALSE;}
+  RooAbsPdf* pdf=0;
+  Long64_t PdfN[GetPDFs().getSize()];
+  Long64_t TotalN=0;
+  for(Int_t ip=0;ip<GetPDFs().getSize();ip++){
+    pdf=(RooAbsPdf*)&(GetPDFs()[ip]);
+    THSEventsPDF* mpdf=0;
+    cout<<" THSSimFit::InitialiseFit(); PDFs "<<pdf->GetName()<<endl;
+    if(mpdf=dynamic_cast<THSEventsPDF*>(pdf)){//Only applies to THSEventsPDF
+      if(!(mpdf->GetHistPdf())){
+  	cout<<"Start smeared model "<<gDirectory->GetName()<<endl;
+	PdfN[ip]=mpdf->AddSmearedModel(0,GetAuxVars());
+	cout<<"Stop smeared model "<<gDirectory->GetName()<<endl;
+	TotalN+=PdfN[ip];
+	if(PdfN[ip]<10) {
+	  cout<<" THSSimFit::InitialiseFit() no events found for "<<GetName()<<" MODEL: "<<pdf->GetName()<<" probably no events kinmatically allowed in this bin" <<endl;
+	  GetPDFsp()->remove(GetPDFs()[ip]);
+	  GetYieldsp()->remove(*(GetWorkSpace()->var(fYld+pdf->GetName())));
+	  GetWorkSpace()->removeSet("Yields");
+	  GetWorkSpace()->removeSet("PDFs");
+	  GetWorkSpace()->defineSet("Yields",GetYields());
+	  GetWorkSpace()->defineSet("PDFs",GetPDFs());	
+	}
+      }
+    }
+  }
+  for(Int_t ip=0;ip<GetPDFs().getSize();ip++){
+    if(PdfN[ip]/TotalN<fAccFrac){
+      //  cout<<" THSSimFit::InitialiseFit()  "<<GetName()<<" MODEL: "<<GetPDFs()[ip]->GetName()<<" N events below acceptance fraction so not considered significant enough background " <<PdfN[ip] <<" out of "<<TotalN<<endl;
+      GetPDFsp()->remove(GetPDFs()[ip]);
+      GetYieldsp()->remove(*(GetWorkSpace()->var(fYld+pdf->GetName())));
+      GetWorkSpace()->removeSet("Yields");
+      GetWorkSpace()->removeSet("PDFs");
+      GetWorkSpace()->defineSet("Yields",GetYields());
+      GetWorkSpace()->defineSet("PDFs",GetPDFs());	
+      
+    }
+    
+  }
+  if(GetPDFs().getSize()) TotalPDF();
+  else {
+    cout<<" THSSimFit::InitialiseFit() no model found for "<<GetName()<<" probably no events kinmatically allowed in this bin" <<endl;
+    return kFALSE;
+  }
+  return kTRUE;
+  
 }
+

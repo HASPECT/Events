@@ -17,25 +17,28 @@
 
 class THSEventsPDF : public RooAbsPdf {
  public:
- THSEventsPDF() : fHist(0),fHistPdf(0), fRHist(0),fWeightHist(0), fTree(0) {} ; 
+ THSEventsPDF() : fx_off(0),fx(0),falpha(0),fHist(0),fHistPdf(0), fRHist(0),fWeightHist(0), fTree(0) {cout<<"THSEventsPDF()"<<endl;} ; 
   THSEventsPDF(const char *name, const char *title,
 	       RooAbsReal& _x,
 	       RooAbsReal& _alpha,
 	       RooAbsReal& _off,
 	       RooAbsReal& _scale,
+	       Int_t NBins=50,
 	       Int_t NAlphBins=20); //number of bins to make of smeared distribution
   THSEventsPDF(const THSEventsPDF& other, const char* name=0) ;
   virtual TObject* clone(const char* newname) const { return new THSEventsPDF(*this,newname); }
   virtual ~THSEventsPDF();
+
+  
   Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars,const char* rangeName=0) const;
   Double_t analyticalIntegral(Int_t code,const char* rangeName=0) const;
   
   void SetTree(TTree* tree){fTree=tree;}
   TTree* GetTree(){return fTree;}
   void SetEntryList(TEntryList* el) {fTree->SetEntryList(el);}
-   void AddSmearedModel(TTree* tree=0,RooArgList vars=RooArgList());
+  Long64_t AddSmearedModel(TTree* tree=0,RooArgList vars=RooArgList());
   TH2* GetModelHist(){return fRHist;}
-  
+  RooHistPdf* GetHistPdf(){return fHistPdf;}  
   void SetModelHist(TH2F* his){ //set a user created morphing model (not smeared)
     fRHist=his;
     fHist = new RooDataHist(fRHist->GetName(),fRHist->GetName(),RooArgSet(*fx_off,*falpha),RooFit::Import(*fRHist));

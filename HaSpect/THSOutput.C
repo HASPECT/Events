@@ -222,18 +222,22 @@ void THSOutput::HSTerminate(){
 	eltemp->SetName(elist->GetName());
 	elfile->cd(fStepName); //Write in directory with source code
 	eltemp->Write(0,TObject::kOverwrite);
+	infile->Close();
+	delete infile;
 	elfile->Close();
 	delete elfile;
       }
     }
-    cout<<"Infile "<<infile<<endl;
-    if(infile) {
-      infile->Close();
-      delete infile;
-    }
+    cout<<"Infile "<<infile<<" "<<elist<<endl;
+    // if(infile) {
+    //   infile->Close();
+    //   delete infile;
+    // }
+   cout<<"Infile "<<infile<<" "<<elist<<endl;
     //Save the overall event list in a new file in output directory
     TFile* allel=new TFile(fOutName+"/ParentEventList.root","recreate");
     elist->Write();
+    // WriteListtoFile(fStepDir);
     allel->Close();
     delete allel;
   }
@@ -396,7 +400,7 @@ void THSOutput::SortTree(TTree* tree){
   cout<<"THSOutput::SortTree Sorting tree You may want to disable this?"<<endl;
   if(!tree) return;
   if(!tree->GetBranch("fgID")) return;
-  cout<<" Make index "<< tree->BuildIndex("fgID")<<endl;
+  cout<<" Make index "<< tree->BuildIndex("(Long64_t)fgID")<<endl;
   TTreeIndex *index = (TTreeIndex*)tree->GetTreeIndex();
   TTree* cltree=tree->CloneTree(0); //create empty tree with branch adresses set
   cltree->SetAutoSave();
@@ -492,9 +496,9 @@ void THSOutput::CopyCode(TDirectory* curDir,TDirectory* prevDir){
   else fStepName="HSStep_0";
 
   //create list of current source, prepare to add previous code form in file
-  if(fStepDir) delete fStepDir; //cleanup previous step directory
+  //if(fStepDir) delete fStepDir; //cleanup previous step directory
   fStepDir=(TList*)fCodeList->Clone();
-  fStepDir->SetOwner();
+  //fStepDir->SetOwner();
   fStepDir->SetName(fStepName);
   
   //If there was a previous step copy its source to the new step list

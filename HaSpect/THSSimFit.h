@@ -8,19 +8,18 @@ using namespace std;
 
 class THSSimFit : public THSRooFit {
  protected:
-  Bool_t fIsBinTrees;
+ Double_t  fAccFrac;
  public:
  THSSimFit() ;
- THSSimFit(TString name):THSRooFit(name) {};
+ THSSimFit(TString name):THSRooFit(name) { }
  // THSSimFit(THSSimFit* rf) ;
  virtual ~THSSimFit(){};
 
- virtual void RunWeights();
  void SetModelEventsTree(TString name,TTree* tree);
- virtual void RunWithTrees();
- virtual void RunWithBins();
- void SetBinTrees(){fIsBinTrees=kTRUE;}
- 
+ virtual void RunWithBins(Int_t Nbins=1);
+ virtual void PrepareForFarm();
+ virtual Bool_t  InitialiseFit();
+ void SetAccFrac(Double_t af) {fAccFrac=af;}
  ClassDef(THSSimFit, 0)  // RooFit mc simulation fit class
 
 };

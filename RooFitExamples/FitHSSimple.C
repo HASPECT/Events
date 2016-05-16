@@ -1,9 +1,9 @@
 
 {
-  gROOT->LoadMacro("THSBins.C+");
-  gROOT->LoadMacro("THSRooFit.C+");
+  gROOT->LoadMacro("$HSANA/THSBins.C++");
+  gROOT->LoadMacro("$HSANA/THSRooFit.C++");
 
-  THSRooFit* RF=new THSRooFit();
+  THSRooFit* RF=new THSRooFit("Simple");
   RF->SetOutDir("testSimple/");
   ///////////////////////////////Load Variables
   RF->LoadVariable("Mmiss[-0.15,0.2]");//should be same name as variable in tree  
@@ -22,9 +22,9 @@
    ///////////////////////////Load Data
   TChain chain("HSParticles");
   chain.AddFile("/home/dglazier/Dropbox/g11pipi/testfit/twopi_ppip_pmiss.root");
-  RF->SetIDBranchName("fgID");
+  //RF->SetIDBranchName("fgID");
   //import to RooFit
   RF->LoadDataSet(&chain);
   RF->RunWeights();
-
+  RF->DrawTreeVar("MmissP",100,0,3);
 }
