@@ -30,7 +30,7 @@
 #include <TProofOutputFile.h>
 #include <iostream>
 #include <utility>
-#include "eLoss.h"              //For energy loss correc
+#include "eLoss.h"              //For energy loss correction
 using namespace std;
 
 TLorentzVector gTarget(0,0,0,9.38271999999999995e-01);
@@ -110,9 +110,25 @@ void MCCLAStoHS::SlaveBegin(TTree * /*tree*/)
    }
    THSHisto::LoadHistograms();
 
+//from old MCCLAStoHS.C code; if used, all the lines should not be commented until "end of old MCCLAStoHS.C code"
+// cout<<"here "<<endl;
+//    //Load a previosly determined mc correction
+//    TDirectory* savedir=gDirectory; 
+//    TFile* hisCorr=0; 
+//    hisCorr=new TFile("/home/haspectuser/HASPECT/AmpTools_Interface/mc_correction/mc_correction.root"); 
+//    savedir->cd(); 
+// cout<<"HC "<<hisCorr<<endl; 
+//    if(hisCorr->IsOpen()) 
+//      for(Int_t i=0;i<fNtype.size();i++){ 
+//        fMCCorr[fTypeNames[i].first]=(TH2F*)hisCorr->Get(fTypeNames[i].second+"Cor")->Clone(); 
+//      } 
+//    else cout<<"MCCLAStoHS::SlaveBegin MC Warning Corrections histograms not found"<<endl; 
+//}//end of old MCCLAStoHS.C code
+
+//new MCCLAStoHS.code
    //Load a previosly determined mc correction
-   TDirectory* savedir=gDirectory;
-   TFile* hisCorr=0;
+   TDirectory* savedir=gDirectory; //not commented in the new code
+   TFile* hisCorr=0; //not commented in the new code
    // hisCorr=new TFile("/home/dglazier/Dropbox/g11sim/g11_pipi/g11_pipi3/");
    // savedir->cd();
    // if(hisCorr->IsOpen())
@@ -121,8 +137,8 @@ void MCCLAStoHS::SlaveBegin(TTree * /*tree*/)
    //   }
    // else cout<<"MCCLAStoHS::SlaveBegin MC Warning Corrections histograms not found"<<endl;
 
-   //init eloss centre x,y,z,st counter
-     initELoss(0.,0.,0.,0); 	
+   //init eloss centre x,y,z,st counter// comment added to the new code
+     initELoss(0.,0.,0.,0);// not commented, added to the new code; also not commented in case MCCorrection is used
 
 }
 
@@ -184,7 +200,7 @@ void MCCLAStoHS::Terminate()
    while((outo=dynamic_cast<TObject*>(next()))){
      if((elpofile=dynamic_cast<TProofOutputFile*>(outo))){
        TFile* hfile = elpofile->OpenFile("UPDATE");
-       cout<<"Gong to make corrections for "<<hfile->GetName()<<endl;
+       cout<<"Going to make corrections for "<<hfile->GetName()<<endl;
        //Loop over Cuts (particles) these are kept in THSHisto
        for(UInt_t ic=0;ic<fVecCuts.size();ic++){
 	 cout<<"doing "<<fVecCuts[ic]<<endl;
@@ -260,7 +276,7 @@ Bool_t MCCLAStoHS::IsGoodEventGhosts(){
 
 
 void MCCLAStoHS::MakeDetected(){
- //this function controls the interfaciing of the reconstructed data to THSParticles
+ //this function controls the interfacing of the reconstructed data to THSParticles
   Int_t iIDall[gpart]; //array containing order of particle IDs in id array for all tracks (incl ghosts) 
   Int_t iID[fNdet]; //array containing order of particle IDs in id array for "real" tracks
   TMath::Sort((Int_t)gpart,fID,iIDall,kFALSE); //order the array in asscending order(kFALSE), e.g. -211,211,211
@@ -354,20 +370,21 @@ Int_t  MCCLAStoHS::MassID(Int_t itrk){
   int mass_pdg[]={11,211,321,2212,0};    //PDG id corresponding to mass2_limit
   Int_t ip=0;
   while(m[itrk]>=mass2_limits[ip]) ip++;
-
-  Int_t tid=mass_pdg[ip]*id[itrk]/TMath::Abs(id[itrk]);  //sign of id= charge
-  // cout<<itrk<<" "<<tid<<" "<<mass_pdg[ip]<<" "<<m[itrk]<<" "<<endl;
+  Int_t charge=0;
+  if(id[itrk]==11||id[itrk]==-211||id[itrk]==-321||id[itrk]==-2212)charge=-1;
+  else if(id[itrk]==-11||id[itrk]==211||id[itrk]==321||id[itrk]==2212)charge=1;
+  Int_t tid=mass_pdg[ip]*charge;  //sign of id= charge
   return tid;
 }
 
 //MC TRUTH Functions
 void MCCLAStoHS::MakeDetectedMC(){
   GetEventMCBranches(fEntry); //get an event to check
- //this function controls the interfaciing to the MC truth particles
+ //this function controls the interfacing to the MC truth particles
 
   Int_t Ndet=0;
   TVector3 vec3(0,0,1);//for setting 4-vector momentum
-  //looping over all generated particles which may be different from erquested particles
+  //looping over all generated particles which may be different from requested particles
   //but we are only going to save requested particles
   Double_t dtr=TMath::DegToRad();
   for(UInt_t idet=0;idet<fNdet;++idet){//loop over detected particles and find corresponding truth
@@ -377,7 +394,7 @@ void MCCLAStoHS::MakeDetectedMC(){
       if(mcid[mctype]!=fDetParticle[idet]->PDG()) continue;
       vec3.SetMagThetaPhi(mcp[mctype],mctheta[mctype]*dtr,mcphi[mctype]*dtr);
       Double_t diff=0;
-      if((diff=TMath::Abs((vec3-fDetParticle[idet]->P4p()->Vect()).Mag()))<pdiff){ //make diffierence in momentum vectors
+      if((diff=TMath::Abs((vec3-fDetParticle[idet]->P4p()->Vect()).Mag()))<pdiff){ //make difference in momentum vectors
 	  //keep the id of the smallest diff
 	  pdiff=diff;
 	  imc=mctype;
@@ -401,7 +418,7 @@ Bool_t MCCLAStoHS::CheckMCTruth(){
   //now compare with the particles defined in fFinalState 
   if(!(std::equal(EventState.begin(),EventState.end(),fFinalState.begin()))){
 
-    cout<<"Warning MC trueht particle do not exactly match those requested for final state"<<endl;
+    cout<<"Warning MC truth particle do not exactly match those requested for final state"<<endl;
     cout<<"Momentum diff histograms may not be correct!!"<<endl;
     for(Int_t ifs=0;ifs<mcnentr;ifs++) cout<<" ID = "<<mcid[ifs]<<endl;
     }
@@ -444,6 +461,11 @@ void MCCLAStoHS::FillHistograms(TString sCut,Int_t bin){
   fCurrBin=bin;
   //Get histogram from list
   //Fill histogram
+
+  //TString sLAbel;//old MCCLAStoHS.C code
+  //sLabel=sCut+fVecBinNames[bin];//old MCCLAStoHS.C code
+  //FindHist("Pdiff"+sLabel)->Fill(fp4true->Rho()-fp4rec->Rho());//old MCCLAStoHS.C code
+
   FindHist("Pdiff")->Fill(fp4true->Rho()-fp4rec->Rho());
   
 }
@@ -463,16 +485,18 @@ Double_t MCCLAStoHS::AddATBranches(Bool_t wipe){
   fATPx=new Double_t[fNAT];
   fATPz=new Double_t[fNAT];
   fATPy=new Double_t[fNAT];
-  fATPdg=new Double_t[fNAT];
-  fOutTree->Branch("Ef",fATE,Form("Ef[%d]/D",fNAT));
+  fATPdg=new Int_t[fNAT];
+  fOutTree->Branch("npart",&fNAT,Form("npart/I"));
+  fOutTree->SetBranchStatus("npart",1); 
+  fOutTree->Branch("Ef",fATE,"Ef[npart]/D");
   fOutTree->SetBranchStatus("Ef",1); 
-  fOutTree->Branch("px",fATPx,Form("px[%d]/D",fNAT));
+  fOutTree->Branch("px",fATPx,Form("px[npart]/D"));
   fOutTree->SetBranchStatus("px",1); 
-  fOutTree->Branch("py",fATPy,Form("py[%d]/D",fNAT));
+  fOutTree->Branch("py",fATPy,Form("py[npart]/D"));
   fOutTree->SetBranchStatus("py",1); 
-  fOutTree->Branch("pz",fATPz,Form("pz[%d]/D",fNAT));
+  fOutTree->Branch("pz",fATPz,Form("pz[npart]/D"));
   fOutTree->SetBranchStatus("pz",1); 
-  fOutTree->Branch("particle_id",fATPdg,Form("particle_id[%d]/D",fNAT));
+  fOutTree->Branch("particle_id",fATPdg,Form("particle_id[npart]/I"));
   fOutTree->SetBranchStatus("particle_id",1); 
   fOutTree->Branch("Ein_beam",&fATEb,"Ein_beam/D");
   fOutTree->SetBranchStatus("Ein_beam",1); 
@@ -485,22 +509,25 @@ Double_t MCCLAStoHS::AddATtrBranches(){
   fATtrPx=new Double_t[fNAT];
   fATtrPz=new Double_t[fNAT];
   fATtrPy=new Double_t[fNAT];
-  fATtrPdg=new Double_t[fNAT];
-  fOutTree->Branch("tr_Ef",fATtrE,Form("Ef[%d]/D",fNAT));
+  fATtrPdg=new Int_t[fNAT];
+  //fOutTree->Branch("tr_npart",&fNAT,Form("tr_npart/I"));
+  //fOutTree->SetBranchStatus("tr_npart",1); 
+  fOutTree->Branch("tr_Ef",fATtrE,Form("tr_Ef[npart]/D"));
   fOutTree->SetBranchStatus("tr_Ef",1); 
-  fOutTree->Branch("tr_px",fATtrPx,Form("px[%d]/D",fNAT));
+  fOutTree->Branch("tr_px",fATtrPx,Form("tr_px[npart]/D"));
   fOutTree->SetBranchStatus("tr_px",1); 
-  fOutTree->Branch("tr_py",fATtrPy,Form("py[%d]/D",fNAT));
+  fOutTree->Branch("tr_py",fATtrPy,Form("tr_py[npart]/D"));
   fOutTree->SetBranchStatus("tr_py",1); 
-  fOutTree->Branch("tr_pz",fATtrPz,Form("pz[%d]/D",fNAT));
+  fOutTree->Branch("tr_pz",fATtrPz,Form("tr_pz[npart]/D"));
   fOutTree->SetBranchStatus("tr_pz",1); 
-  fOutTree->Branch("tr_particle_id",fATtrPdg,Form("particle_id[%d]/D",fNAT));
+  fOutTree->Branch("tr_particle_id",fATtrPdg,Form("tr_particle_id[npart]/I"));
   fOutTree->SetBranchStatus("tr_particle_id",1); 
   fOutTree->Branch("tr_Ein_beam",&fATtrEb,"tr_Ein_beam/D");
   fOutTree->SetBranchStatus("tr_Ein_beam",1); 
 }
 Double_t MCCLAStoHS::doAT(){
-  for(Int_t in=0;in<fNAT-1;in++){
+ 
+  for(Int_t in=0;in<fNdet;in++){
     fATE[in]=fDetParticle[in]->P4p()->E();   
     fATPx[in]=fDetParticle[in]->P4p()->Px();   
     fATPy[in]=fDetParticle[in]->P4p()->Py();   
@@ -522,7 +549,7 @@ Double_t MCCLAStoHS::doATtr(){
   TLorentzVector vec4;
   TVector3 vec3;
   Double_t dtr=TMath::DegToRad();
-  if(fNAT!=mcnentr&&fEntry<20){cout<<"warning mctruth particles are not equal to the AMpTools output "<<fNAT<<" "<<mcnentr<<endl;}
+  if(fNAT!=mcnentr&&fEntry<20){cout<<"warning mctruth particles are not equal to the AmpTools output "<<fNAT<<" "<<mcnentr<<endl;}
   for(Int_t in=0;in<mcnentr;in++){
     vec3.SetMagThetaPhi(mcp[in],mctheta[in]*dtr,mcphi[in]*dtr);
     vec4.SetVectM(vec3,mcm[in]);

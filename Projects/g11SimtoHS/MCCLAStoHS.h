@@ -72,12 +72,12 @@ Double_t  Correct_MCTrackMomentum(Int_t pdg,TLorentzVector p4);
   Double_t* fATPx;
   Double_t* fATPy;
   Double_t* fATPz;
-  Double_t* fATPdg;
+  Int_t* fATPdg;
   Double_t* fATtrE;
   Double_t* fATtrPx;
   Double_t* fATtrPy;
   Double_t* fATtrPz;
-  Double_t* fATtrPdg;
+  Int_t* fATtrPdg;
   Double_t fATEb;
   Double_t fATtrEb;
 

@@ -252,8 +252,9 @@ Int_t  CLAStoHS::MassID(Int_t itrk){
   int mass_pdg[]={11,211,321,2212,0};    //PDG id corresponding to mass2_limit
   Int_t ip=0;
   while(m[itrk]>=mass2_limits[ip]) ip++;
-
-  Int_t tid=mass_pdg[ip]*TMath::Sign(1,id[itrk]);  //sign of id= charge
-  // cout<<itrk<<" "<<tid<<" "<<mass_pdg[ip]<<" "<<m[itrk]<<" "<<endl;
+  Int_t charge=0;
+  if(id[itrk]==11||id[itrk]==-211||id[itrk]==-321||id[itrk]==-2212)charge=-1;
+  else if(id[itrk]==-11||id[itrk]==211||id[itrk]==321||id[itrk]==2212)charge=1;
+  Int_t tid=mass_pdg[ip]*charge;  //sign of id= charge
   return tid;
 }

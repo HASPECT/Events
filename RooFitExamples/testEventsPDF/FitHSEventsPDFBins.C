@@ -1,11 +1,11 @@
 
 {
-  gSystem->AddIncludePath("-I../testSimple/");
-  gROOT->LoadMacro("../testSimple/THSBins.C+");
-  gROOT->LoadMacro("../testSimple/THSWeights.C+");
-  gROOT->LoadMacro("../testSimple/THSRooFit.C+");
-  gROOT->LoadMacro("THSEventsPDF.C+");
-  gROOT->LoadMacro("THSSimFit.C+");
+  gSystem->AddIncludePath("-I$HSANA/");
+  gROOT->LoadMacro("$HSANA/THSBins.C+");
+  gROOT->LoadMacro("$HSANA/THSWeights.C+");
+  gROOT->LoadMacro("$HSANA/THSRooFit.C+");
+  gROOT->LoadMacro("$HSANA/THSEventsPDF.C+");
+  gROOT->LoadMacro("$HSANA/THSSimFit.C+");
 
   THSSimFit* RF=new THSSimFit("SF");
   RF->SetOutDir("outBins/");

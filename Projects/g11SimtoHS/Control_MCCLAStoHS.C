@@ -8,11 +8,11 @@
    
   //Set up the input chain to be analysed
    TChain* tree=new TChain("h10","datachain");
-   tree->Add("YOURINPUTFILES");
+   tree->Add("/run/media/dglazier/hd_dglazier/Data/g11_pipi3/g11_pipi32001*.bos.evt.recsis.root");
  
    //Set the ouput directory or file (if full file name is given just 1 file is created, while if a directory it will be created and filled with files of the same name as the input 
    gSystem->Setenv("HSOUT",
-		   "YOUROUTPUTDIRECTORYORFILE");
+		   "/run/media/dglazier/hd_dglazier/Data/HSANAtest/");
  
    //Configure the analysis (i.e PROOF, source compilation...)
    TString HSANA=gSystem->Getenv("HSANA");

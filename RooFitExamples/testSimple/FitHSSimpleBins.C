@@ -1,9 +1,9 @@
 
 {
-  //  gSystem->AddIncludePath("-I");
-  gROOT->LoadMacro("THSBins.C+");
-  gROOT->LoadMacro("THSWeights.C+");
-  gROOT->LoadMacro("THSRooFit.C++");
+  gSystem->AddIncludePath("-I$HSANA/");
+  gROOT->LoadMacro("$HSANA/THSBins.C+");
+  gROOT->LoadMacro("$HSANA/THSWeights.C+");
+  gROOT->LoadMacro("$HSANA/THSRooFit.C++");
 
   THSRooFit* RF=new THSRooFit("binFit");
   RF->SetOutDir("outBins/");

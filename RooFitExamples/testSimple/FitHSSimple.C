@@ -30,10 +30,12 @@
   //import to RooFit
   RF->LoadDataSet(&chain);
   gBenchmark->Start("Simple");
-  RF->RunWeights(5); //argument gives number of parameter fits to perform
+  RF->RunWeights(2); //argument gives number of parameter fits to perform
+  //Do some other stuff before saving weights
   RF->DrawTreeVar("M1",100,0,10);
   RF->DrawTreeVar("M2",100,0,10);
   gBenchmark->Stop("Simple");
   gBenchmark->Print("Simple");
+  RF->GetWeights()->Save();
 
 }

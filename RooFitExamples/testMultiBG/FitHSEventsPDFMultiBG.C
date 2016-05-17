@@ -1,20 +1,20 @@
 
 {
-  gSystem->AddIncludePath("-I../testSimple/");
-  gROOT->LoadMacro("../testSimple/THSBins.C+");
-  gROOT->LoadMacro("../testSimple/THSWeights.C+");
-  gROOT->LoadMacro("../testSimple/THSRooFit.C+");
-  gROOT->LoadMacro("../testEventsPDF/THSEventsPDF.C+");
-  gROOT->LoadMacro("../testEventsPDF/THSSimFit.C+");
+  gSystem->AddIncludePath("-I$HSANA/");
+  gROOT->LoadMacro("$HSANA/THSBins.C+");
+  gROOT->LoadMacro("$HSANA/THSWeights.C+");
+  gROOT->LoadMacro("$HSANA/THSRooFit.C+");
+  gROOT->LoadMacro("$HSANA/THSEventsPDF.C+");
+  gROOT->LoadMacro("$HSANA/THSSimFit.C+");
 
   THSSimFit* RF=new THSSimFit("SF");
   RF->SetOutDir("out/");
   RF->SetBinnedFit(); //Make it much faster binned chi2 for parameters
   RF->SetSingleSpecies("Signal"); //Merge all backgrounds into 1 PDF for sFit
-   RF->SetSPlotRange(3,7); //Use a differnt range for sFit
+  RF->SetSPlotRange(3,7); //Use a differnt range for sFit
   ///////////////////////////////Load Variables
   RF->LoadVariable("Mmiss[1,9]");//should be same name as variable in tree 
-   RF->GetWorkSpace()->var("Mmiss")->setBins(100); 
+  RF->GetWorkSpace()->var("Mmiss")->setBins(100); 
   RF->LoadBinVars("Eg",1,3,4);//should be same name as variable in tree 
   RF->LoadBinVars("M1",4,0,10);//should be same name as variable in tree 
 
