@@ -343,9 +343,9 @@ void THSRooFit::sPlot(){
     ((TCanvas*)fCanvases->Last())->SetTitle(Form("%s Model on new Range = %d",GetName(),fChi2));
     
   }
-  if(fBinnedFit) {fBinnedFit=kFALSE;Fit();fBinnedFit=kTRUE;}//if doing multiple binned fits do final MLL for splot
-  PlotDataModel();
-  ((TCanvas*)fCanvases->Last())->SetTitle(Form("%s Final Likelihood Fit  = %d",GetName(),fChi2));
+  //  if(fBinnedFit) {fBinnedFit=kFALSE;Fit();fBinnedFit=kTRUE;}//if doing multiple binned fits do final MLL for splot
+  // PlotDataModel();
+  //((TCanvas*)fCanvases->Last())->SetTitle(Form("%s Final Likelihood Fit  = %d",GetName(),fChi2));
   fWS->var("Mmiss")->Print();
   cout<<"Entries "<<fData->numEntries()<<endl;
   fParameters.setAttribAll("Constant");
@@ -693,7 +693,7 @@ void THSRooFit::RunWeights(Int_t Nbins){
   //save weights to file
   GetWeights()->PrintWeight();
   GetWeights()->SortWeights();
-  GetWeights()->Save();
+  // GetWeights()->Save();
 }
 void THSRooFit::FitMany(Int_t Nfits){
   //Do the fit many times with different initial paramters
