@@ -346,7 +346,6 @@ void THSRooFit::sPlot(){
   //  if(fBinnedFit) {fBinnedFit=kFALSE;Fit();fBinnedFit=kTRUE;}//if doing multiple binned fits do final MLL for splot
   // PlotDataModel();
   //((TCanvas*)fCanvases->Last())->SetTitle(Form("%s Final Likelihood Fit  = %d",GetName(),fChi2));
-  fWS->var("Mmiss")->Print();
   cout<<"Entries "<<fData->numEntries()<<endl;
   fParameters.setAttribAll("Constant");
   fSPlot = new RooStats::SPlot("splot_fit", "sPlot Fit", *((RooDataSet*)fData),fModel ,fYields);
