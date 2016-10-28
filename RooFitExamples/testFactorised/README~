@@ -1,0 +1,4 @@
+This example follows on from testEventsPDF, but covers the case when it is required to fit 2 variables to disentangle 2 sepetate types of background. The method employed is to perform 2 "factorised" fits the second using the weights from the first to remove one of the contributions from the first fit. Note the resulting weights after the second fit will be the product of the sWeights from the 2 fits.
+/////////////////////////////////////////////////////////////////////
+MODEL
+In this case there is a signal and 2 backgrounds. The signal and BG1 have the same shape in the Mmiss variable, while BG2 is different. The signal and BG1 have different distributions in M1 so this can be used as a second discriminatory variable.

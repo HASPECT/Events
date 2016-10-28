@@ -1,0 +1,872 @@
+  *******************************************
+  *                                         *
+  *        W E L C O M E  to  R O O T       *
+  *                                         *
+  *   Version   5.34/36      5 April 2016   *
+  *                                         *
+  *  You are welcome to visit our Web site  *
+  *          http://root.cern.ch            *
+  *                                         *
+  *******************************************
+
+ROOT 5.34/36 (v5-34-36@v5-34-36, Apr 05 2016, 10:25:45 on linuxx8664gcc)
+
+CINT/ROOT C/C++ Interpreter version 5.18.00, July 2, 2010
+Type ? for help. Commands must be C++ statements.
+Enclose multiple statements between { }.
+
+Processing $RUNMAC(TString(gSystem->Getenv("JOBNAME")))...
+Running HSRunBatch on  Eg3.50_M18.75_
+Info in <TUnixSystem::ACLiC>: creating shared library /scratch/dglazier/Eg3.50_M18.75_/./THSBins_C.so
+Info in <TUnixSystem::ACLiC>: creating shared library /scratch/dglazier/Eg3.50_M18.75_/./THSWeights_C.so
+Info in <TUnixSystem::ACLiC>: creating shared library /scratch/dglazier/Eg3.50_M18.75_/./THSRooFit_C.so
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+Info in <TUnixSystem::ACLiC>: creating shared library /scratch/dglazier/Eg3.50_M18.75_/./THSsPlot_C.so
+Info in <TUnixSystem::ACLiC>: creating shared library /scratch/dglazier/Eg3.50_M18.75_/./THSEventsPDF_C.so
+TFile**		FarmEg3.50_M18.75_.root	
+ TFile*		FarmEg3.50_M18.75_.root	
+  KEY: RooWorkspace	wHS;1	wHS
+  KEY: TProcessID	ProcessID0;1	b53cbf02-9b64-11e6-9717-232dd182beef
+THSEventsPDF()
+THSEventsPDF()
+THSEventsPDF()
+THSEventsPDF()
+
+RooWorkspace(wHS) wHS contents
+
+variables
+---------
+(Eg,M1,Mmiss,Yld_BG,Yld_Signal,alpha,alphaB,fgID,off,offB,scale,scaleB)
+
+p.d.f.s
+-------
+RooGaussian::AlphaConstrBG[ x=alphaB mean=0 sigma=0.25 ] = 1
+RooGaussian::AlphaConstrSignal[ x=alpha mean=0 sigma=0.25 ] = 1
+THSEventsPDF::BG[ x=Mmiss offset=offB scale=scaleB alpha=alphaB ] = 116403
+RooGaussian::OffConstrSignal[ x=off mean=0 sigma=0.5 ] = 1
+RooGaussian::ScConstrSignal[ x=scale mean=1 sigma=0.025 ] = 1
+THSEventsPDF::Signal[ x=Mmiss offset=off scale=scale alpha=alpha ] = 808739
+
+datasets
+--------
+RooDataSet::Eg3.50_M18.75_(Mmiss,fgID)
+
+named sets
+----------
+AuxVars:()
+BinVars:(Eg,M1)
+Constraints:(AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+ID:(fgID)
+PDFs:(Signal,BG)
+Parameters:(alpha,off,scale,alphaB,offB,scaleB)
+Variables:(Mmiss)
+Yields:(Yld_Signal,Yld_BG)
+
+generic objects
+---------------
+RooArgList::
+
+[#0] ERROR:InputArguments -- RooWorkspace::import(wHS) generic object with name  is already in workspace and replaceExisting flag is set to false
+
+RooWorkspace(wHS) wHS contents
+
+variables
+---------
+(Eg,M1,Mmiss,Yld_BG,Yld_Signal,alpha,alphaB,fgID,off,offB,scale,scaleB)
+
+p.d.f.s
+-------
+RooGaussian::AlphaConstrBG[ x=alphaB mean=0 sigma=0.25 ] = 1
+RooGaussian::AlphaConstrSignal[ x=alpha mean=0 sigma=0.25 ] = 1
+THSEventsPDF::BG[ x=Mmiss offset=offB scale=scaleB alpha=alphaB ] = 116403
+RooGaussian::OffConstrSignal[ x=off mean=0 sigma=0.5 ] = 1
+RooGaussian::ScConstrSignal[ x=scale mean=1 sigma=0.025 ] = 1
+THSEventsPDF::Signal[ x=Mmiss offset=off scale=scale alpha=alpha ] = 808739
+
+datasets
+--------
+RooDataSet::(Mmiss,fgID)
+
+named sets
+----------
+AuxVars:()
+BinVars:(Eg,M1)
+Constraints:(AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+ID:(fgID)
+PDFs:(Signal,BG)
+Parameters:(alpha,off,scale,alphaB,offB,scaleB)
+Variables:(Mmiss)
+Yields:(Yld_Signal,Yld_BG)
+
+generic objects
+---------------
+RooArgList::
+
+[#1] INFO:ObjectHandling -- RooWorkspace::import(wHS) importing dataset Eg3.50_M18.75_
+THSRooFit::LoadDataSet Print dataset for Eg3.50_M18.75_
+RooDataSet::Eg3.50_M18.75_[Mmiss,fgID] = 17432 entries
+Initialise 0x7f9afe73f014 17432 2
+[#1] INFO:ObjectHandling -- RooWorkspace::import(wHS) importing RooAddPdf::TotalPDF0
+RooAddPdf::TotalPDF0[ Yld_Signal * Signal + Yld_BG * BG ] = 347182
+0x3899460
+THSRooFit::Fit() 
+RooAddPdf::TotalPDF0[ Yld_Signal * Signal + Yld_BG * BG ] = 347182
+RooArgList:: = (AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+0x36ec740 : OBJ: RooCmdArg	Extended	Extended
+0x37afc30 : OBJ: RooCmdArg	NumCPU	NumCPU
+0x37c0fb0 : OBJ: RooCmdArg	Save	Save
+0x37bfd10 : OBJ: RooCmdArg	Warnings	Warnings
+0x38e7520 : OBJ: RooCmdArg	ExternalConstraints	ExternalConstraints
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  Including the following contraint terms in minimization: (AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+[#1] INFO:Fitting -- RooAddition::defaultErrorLevel(nll_TotalPDF0_Eg3.50_M18.75__with_constr) Summation contains a RooNLLVar, using its error level
+ **********
+ **    9 **SET NOWARNINGS           0
+ **********
+[#1] INFO:Minization -- RooMinuit::optimizeConst: activating const optimization
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  The following expressions will be evaluated in cache-and-track mode: (Signal,BG)
+ **********
+ **   12 **MIGRAD        4000           1
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ START MIGRAD MINIMIZATION.  STRATEGY  1.  CONVERGENCE WHEN EDM .LT. 1.00e-03
+ FCN=-126278 FROM MIGRAD    STATUS=INITIATE       32 CALLS          33 TOTAL
+                     EDM= unknown      STRATEGY= 1      NO ERROR MATRIX       
+  EXT PARAMETER               CURRENT GUESS       STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       4.35800e+03   2.17900e+03   1.95152e-01  -3.53829e+03
+   2  Yld_Signal   8.71600e+03   3.48640e+03   2.35352e-01  -5.23210e+03
+   3  alpha        9.53674e-07   1.00000e-01   3.20776e-01   2.54660e-05
+   4  alphaB       9.53674e-07   1.00000e-01   3.20776e-01   5.30772e-05
+   5  off          0.00000e+00   4.00000e-01   2.01358e-01  -4.51549e+03
+   7  scale        1.00000e+00   2.00000e-02   2.01358e-01  -2.20807e+01
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ FCN=-126940 FROM HESSE     STATUS=NOT POSDEF     48 CALLS         277 TOTAL
+                     EDM=0.639165    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.53131e+03   5.53689e+01   1.89891e-03  -7.56689e+00
+   2  Yld_Signal   1.18971e+04   6.83905e+01   1.81419e-03  -3.82657e-01
+   3  alpha        3.02339e-06   6.33763e-01   5.00000e-01   1.56054e-06
+   4  alphaB       2.27035e-06   8.15672e-01   1.24591e-01   2.04396e-07
+   5  off          6.76818e-04   3.73294e-02   4.62632e-04   6.35151e+01
+   7  scale        1.00687e+00   4.98326e-04   3.83015e-04  -1.18578e+01
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ MIGRAD TERMINATED WITHOUT CONVERGENCE.
+ FCN=-126940 FROM MIGRAD    STATUS=FAILED        327 CALLS         328 TOTAL
+                     EDM=0.00789428    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.53714e+03   7.65345e+01  -0.00000e+00  -2.64365e-01
+   2  Yld_Signal   1.18964e+04   6.83215e+01   0.00000e+00   2.34744e+00
+   3  alpha        5.88303e-06   1.55565e-02  -0.00000e+00  -5.14055e-02
+   4  alphaB       1.19368e-06   8.15473e-01   0.00000e+00   6.78374e-05
+   5  off          3.95029e-04   2.48207e-03  -0.00000e+00   2.28851e+01
+   7  scale        1.00686e+00   3.34663e-05  -0.00000e+00   1.53790e+02
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  5.858e+03 -8.523e+02  4.040e-03 -5.775e-04  7.148e-02  9.164e-04 
+ -8.523e+02  4.668e+03 -9.419e-04  1.176e-05 -2.307e-02 -3.369e-04 
+  4.040e-03 -9.419e-04  3.680e-07 -2.892e-09  4.680e-07  8.004e-09 
+ -5.775e-04  1.176e-05 -2.892e-09  2.363e-05 -4.470e-08 -6.783e-10 
+  7.148e-02 -2.307e-02  4.680e-07 -4.470e-08  6.161e-06  5.962e-08 
+  9.164e-04 -3.369e-04  8.004e-09 -6.783e-10  5.962e-08  1.120e-09 
+ERR MATRIX NOT POS-DEF
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.41488   1.000 -0.163  0.087 -0.002  0.376  0.358
+        2  0.19288  -0.163  1.000 -0.023  0.000 -0.136 -0.147
+        3  0.40296   0.087 -0.023  1.000 -0.001  0.311  0.394
+        4  0.00441  -0.002  0.000 -0.001  1.000 -0.004 -0.004
+        5  0.73026   0.376 -0.136  0.311 -0.004  1.000  0.718
+        7  0.74801   0.358 -0.147  0.394 -0.004  0.718  1.000
+ ERR MATRIX NOT POS-DEF
+ **********
+ **   15 **HESSE        4000
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+ FCN=-126940 FROM HESSE     STATUS=OK             48 CALLS         377 TOTAL
+                     EDM=0.000804525    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                INTERNAL      INTERNAL  
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE   
+   1  Yld_BG       5.53714e+03   1.09519e+02   1.89761e-03  -7.50983e-01
+   2  Yld_Signal   1.18964e+04   1.35467e+02   1.81352e-03  -3.23146e-01
+   3  alpha        5.88303e-06   8.44725e-02   5.00000e-01  -1.56595e+00
+   4  alphaB       1.19368e-06   7.89543e-01   1.24814e-01  -1.56861e+00
+   5  off          3.95029e-04   3.47020e-03   4.82801e-04   1.97514e-04
+   7  scale        1.00686e+00   3.59838e-04   2.16103e-03   6.86777e-02
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  1.199e+04 -6.451e+03 -1.713e-02  1.974e-09 -9.573e-03 -2.570e-03 
+ -6.451e+03  1.835e+04  1.714e-02 -5.223e-09  9.578e-03  2.572e-03 
+ -1.713e-02  1.714e-02  2.046e-06 -3.224e-14  7.018e-07  3.624e-07 
+  1.974e-09 -5.223e-09 -3.224e-14  7.668e-05 -1.428e-14 -8.062e-15 
+ -9.573e-03  9.578e-03  7.018e-07 -1.428e-14  1.204e-05  1.825e-07 
+ -2.570e-03  2.572e-03  3.624e-07 -8.062e-15  1.825e-07  1.295e-07 
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.44081   1.000 -0.435 -0.109  0.000 -0.025 -0.065
+        2  0.43684  -0.435  1.000  0.088 -0.000  0.020  0.053
+        3  0.70835  -0.109  0.088  1.000 -0.000  0.141  0.704
+        4  0.00000   0.000 -0.000 -0.000  1.000 -0.000 -0.000
+        5  0.15632  -0.025  0.020  0.141 -0.000  1.000  0.146
+        7  0.70569  -0.065  0.053  0.704 -0.000  0.146  1.000
+[#1] INFO:Minization -- RooMinuit::optimizeConst: deactivating const optimization
+Plotting versus Mmiss
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+1 THSRooFit::PlotDataModel() chi2 = 0.835037
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (Signal)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (BG)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+Done fit 
+Result 0x3833e30
+THSRooFit::Fit() 
+RooAddPdf::TotalPDF0[ Yld_Signal * Signal + Yld_BG * BG ] = 588803
+0x36ec740 : OBJ: RooCmdArg	Extended	Extended
+0x37afc30 : OBJ: RooCmdArg	NumCPU	NumCPU
+0x37c0fb0 : OBJ: RooCmdArg	Save	Save
+0x37bfd10 : OBJ: RooCmdArg	Warnings	Warnings
+0x38e7520 : OBJ: RooCmdArg	ExternalConstraints	ExternalConstraints
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  Including the following contraint terms in minimization: (AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+[#1] INFO:Fitting -- RooAddition::defaultErrorLevel(nll_TotalPDF0_Eg3.50_M18.75__with_constr) Summation contains a RooNLLVar, using its error level
+ **********
+ **    9 **SET NOWARNINGS           0
+ **********
+[#1] INFO:Minization -- RooMinuit::optimizeConst: activating const optimization
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  The following expressions will be evaluated in cache-and-track mode: (Signal,BG)
+ **********
+ **   12 **MIGRAD        4000           1
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ START MIGRAD MINIMIZATION.  STRATEGY  1.  CONVERGENCE WHEN EDM .LT. 1.00e-03
+ FCN=-119132 FROM MIGRAD    STATUS=INITIATE      358 CALLS         359 TOTAL
+                     EDM= unknown      STRATEGY= 1      NO ERROR MATRIX       
+  EXT PARAMETER               CURRENT GUESS       STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       2.42950e+03   1.09519e+02   0.00000e+00  -1.51903e+04
+   2  Yld_Signal   3.44608e+03   1.35467e+02   0.00000e+00  -2.23410e+04
+   3  alpha        2.43790e-03   8.44725e-02  -2.29447e+00   3.72518e-03
+   4  alphaB       2.82618e-01   7.89543e-01   0.00000e+00   5.33085e+00
+   5  off         -1.72762e-01   3.47020e-03   0.00000e+00  -4.47950e+03
+   7  scale        9.32582e-01   3.59838e-04   0.00000e+00  -1.22623e+02
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ FCN=-126939 FROM HESSE     STATUS=NOT POSDEF     46 CALLS         635 TOTAL
+                     EDM=3.4655    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.51290e+03   3.85468e+01   1.89962e-03  -5.20334e+00
+   2  Yld_Signal   1.19138e+04   4.26506e+01   1.81367e-03  -4.18086e+00
+   3  alpha        3.17734e-04   9.36712e-01   9.86822e-02   9.17124e-05
+   4  alphaB       2.46934e-02   7.48091e-03   4.18372e-02   7.62357e-01
+   5  off         -2.19737e-03   3.96282e-03   7.04912e-04  -9.48268e+01
+   7  scale        1.00275e+00   5.19491e-02   1.97411e-02  -5.15012e+00
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ MIGRAD TERMINATED WITHOUT CONVERGENCE.
+ FCN=-126940 FROM MIGRAD    STATUS=FAILED        725 CALLS         726 TOTAL
+                     EDM=274706    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.51485e+03   2.55605e+01  -0.00000e+00  -1.78187e+01
+   2  Yld_Signal   1.19127e+04   3.87882e+01   0.00000e+00   4.53801e+00
+   3  alpha        3.48645e-04   2.51792e-04  -0.00000e+00   5.39815e-04
+   4  alphaB       2.45010e-02   6.08001e-03   0.00000e+00   9.36512e-01
+   5  off         -2.41433e-03   1.91280e-04  -0.00000e+00  -4.16570e+03
+   7  scale        1.00576e+00   1.71628e-04   0.00000e+00  -4.57840e+02
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  6.533e+02  6.597e+01  4.308e-03  8.012e-02 -4.435e-04  5.132e-05 
+  6.597e+01  1.505e+03 -1.536e-03 -2.705e-02  1.556e-04 -2.317e-05 
+  4.308e-03 -1.536e-03 -6.340e-08 -9.384e-07  6.751e-09 -9.758e-09 
+  8.012e-02 -2.705e-02 -9.384e-07  3.699e-05  9.955e-08 -5.286e-09 
+ -4.435e-04  1.556e-04  6.751e-09  9.955e-08  3.659e-08 -1.798e-08 
+  5.132e-05 -2.317e-05 -9.758e-09 -5.286e-09 -1.798e-08  2.946e-08 
+ERR MATRIX NOT POS-DEF
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.00000   1.000  0.067  0.669  0.515 -0.091  0.012
+        2  0.00000   0.067  1.000 -0.157 -0.115  0.021 -0.003
+        3  0.00000   0.669 -0.157 -1.000 -0.613  0.140 -0.226
+        4  0.00000   0.515 -0.115 -0.613  1.000  0.086 -0.005
+        5  0.00000  -0.091  0.021  0.140  0.086  1.000 -0.548
+        7  0.00000   0.012 -0.003 -0.226 -0.005 -0.548  1.000
+ ERR MATRIX NOT POS-DEF
+ **********
+ **   15 **HESSE        4000
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+ FCN=-126940 FROM HESSE     STATUS=OK             48 CALLS         775 TOTAL
+                     EDM=7.43051    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                INTERNAL      INTERNAL  
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE   
+   1  Yld_BG       5.51485e+03   1.08628e+02   1.89733e-03  -7.52734e-01
+   2  Yld_Signal   1.19127e+04   1.34954e+02   1.81377e-03  -3.22162e-01
+   3  alpha        3.48645e-04   8.70711e-01   7.64738e-02  -1.53345e+00
+   4  alphaB       2.45010e-02   2.12850e-02   3.37518e-02  -1.25645e+00
+   5  off         -2.41433e-03   1.89017e-04   7.25665e-05  -1.20717e-03
+   7  scale        1.00576e+00   8.37306e-05   6.44200e-04   5.76359e-02
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  1.180e+04 -6.289e+03  1.208e-07 -3.393e-02 -1.501e-05  4.016e-05 
+ -6.289e+03  1.821e+04 -6.362e-08  3.394e-02  1.503e-05 -4.022e-05 
+  1.208e-07 -6.362e-08  2.457e-02  2.153e-11 -1.919e-16  4.027e-16 
+ -3.393e-02  3.394e-02  2.153e-11  4.559e-04 -7.534e-10 -2.920e-10 
+ -1.501e-05  1.503e-05 -1.919e-16 -7.534e-10  3.573e-08 -2.129e-12 
+  4.016e-05 -4.022e-05  4.027e-16 -2.920e-10 -2.129e-12  7.011e-09 
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.42914   1.000 -0.429  0.000 -0.015 -0.001  0.004
+        2  0.42906  -0.429  1.000 -0.000  0.012  0.001 -0.004
+        3  0.00000   0.000 -0.000  1.000  0.000 -0.000  0.000
+        4  0.01585  -0.015  0.012  0.000  1.000 -0.000 -0.000
+        5  0.00083  -0.001  0.001 -0.000 -0.000  1.000 -0.000
+        7  0.00479   0.004 -0.004  0.000 -0.000 -0.000  1.000
+[#1] INFO:Minization -- RooMinuit::optimizeConst: deactivating const optimization
+Plotting versus Mmiss
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+2 THSRooFit::PlotDataModel() chi2 = 0.836349
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (Signal)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (BG)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+THSRooFit::Fit() 
+RooAddPdf::TotalPDF0[ Yld_Signal * Signal + Yld_BG * BG ] = 589194
+0x36ec740 : OBJ: RooCmdArg	Extended	Extended
+0x37afc30 : OBJ: RooCmdArg	NumCPU	NumCPU
+0x37c0fb0 : OBJ: RooCmdArg	Save	Save
+0x37bfd10 : OBJ: RooCmdArg	Warnings	Warnings
+0x38e7520 : OBJ: RooCmdArg	ExternalConstraints	ExternalConstraints
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  Including the following contraint terms in minimization: (AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+[#1] INFO:Fitting -- RooAddition::defaultErrorLevel(nll_TotalPDF0_Eg3.50_M18.75__with_constr) Summation contains a RooNLLVar, using its error level
+ **********
+ **    9 **SET NOWARNINGS           0
+ **********
+[#1] INFO:Minization -- RooMinuit::optimizeConst: activating const optimization
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  The following expressions will be evaluated in cache-and-track mode: (Signal,BG)
+ **********
+ **   12 **MIGRAD        4000           1
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ START MIGRAD MINIMIZATION.  STRATEGY  1.  CONVERGENCE WHEN EDM .LT. 1.00e-03
+ FCN=12681.6 FROM MIGRAD    STATUS=INITIATE       57 CALLS          58 TOTAL
+                     EDM= unknown      STRATEGY= 1      NO ERROR MATRIX       
+  EXT PARAMETER               CURRENT GUESS       STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       1.58046e+00   1.08628e+02   0.00000e+00  -1.52050e+06
+   2  Yld_Signal   7.31656e-01   1.34954e+02   0.00000e+00  -1.56994e+06
+   3  alpha        3.48645e-04   8.70711e-01   0.00000e+00   1.41364e+00
+   4  alphaB       6.74685e-01   2.12850e-02  -1.53597e-01  -1.73394e+01
+   5  off         -6.01055e-02   1.89017e-04   0.00000e+00  -7.45497e+02
+   7  scale        1.09150e+00   8.37306e-05   0.00000e+00  -4.22806e+01
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ FCN=-126939 FROM HESSE     STATUS=NOT POSDEF     46 CALLS         601 TOTAL
+                     EDM=3.02801    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.50846e+03   2.93302e+01   1.89811e-03   1.86156e+01
+   2  Yld_Signal   1.19742e+04   3.65185e+01   1.81717e-03   5.88528e+01
+   3  alpha        4.55129e-05   9.88907e-01   1.00223e-01  -5.34681e-06
+   4  alphaB       1.96648e-02   1.13034e-02   6.77026e-02  -4.36896e-02
+   5  off         -2.27970e-03   4.75528e-02   8.02962e-04  -9.49598e+01
+   7  scale        1.00231e+00   4.32086e-03   1.64908e-02  -4.58949e+00
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ MIGRAD TERMINATED WITHOUT CONVERGENCE.
+ FCN=-126939 FROM MIGRAD    STATUS=FAILED        647 CALLS         648 TOTAL
+                     EDM=26.0471    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.49854e+03   3.75038e+01  -0.00000e+00  -1.44107e+01
+   2  Yld_Signal   1.19314e+04   1.06857e+02  -0.00000e+00   5.74741e+00
+   3  alpha        2.44920e-05   1.30557e-03  -0.00000e+00   2.55017e+00
+   4  alphaB       1.92951e-02   1.12318e-02   0.00000e+00  -5.69570e-01
+   5  off          7.94421e-04   7.13453e-03   0.00000e+00   3.94079e+01
+   7  scale        1.00262e+00   6.91020e-04   0.00000e+00  -5.21865e+00
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  1.407e+03  2.311e+03  3.031e-03 -2.026e-02 -3.284e-02 -4.142e-03 
+  2.311e+03  1.142e+04  3.956e-03 -8.689e-02 -1.467e-01 -1.839e-02 
+  3.031e-03  3.956e-03  1.280e-07  9.667e-07 -1.483e-06 -1.332e-07 
+ -2.026e-02 -8.689e-02  9.667e-07  1.264e-04  1.272e-06  1.590e-07 
+ -3.284e-02 -1.467e-01 -1.483e-06  1.272e-06  5.090e-05  4.703e-06 
+ -4.142e-03 -1.839e-02 -1.332e-07  1.590e-07  4.703e-06  4.775e-07 
+ERR MATRIX NOT POS-DEF
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.61384   1.000  0.577  0.226 -0.048 -0.123 -0.160
+        2  0.61514   0.577  1.000  0.103 -0.072 -0.192 -0.249
+        3  0.66466   0.226  0.103  1.000  0.240 -0.581 -0.539
+        4  0.32586  -0.048 -0.072  0.240  1.000  0.016  0.020
+        5  0.95883  -0.123 -0.192 -0.581  0.016  1.000  0.954
+        7  0.95648  -0.160 -0.249 -0.539  0.020  0.954  1.000
+ ERR MATRIX NOT POS-DEF
+ **********
+ **   15 **HESSE        4000
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ FCN=-126939 FROM HESSE     STATUS=NOT POSDEF     46 CALLS         695 TOTAL
+                     EDM=4.3759    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE     INTERNAL      INTERNAL  
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE   
+   1  Yld_BG       5.49854e+03   6.98557e+01   1.90016e-03  -7.54017e-01
+   2  Yld_Signal   1.19314e+04   7.06795e+01   1.81768e-03  -3.21033e-01
+   3  alpha        2.44920e-05   9.17064e-01   5.00000e-01  -1.56090e+00
+   4  alphaB       1.92951e-02   1.78179e-02   8.34677e-02  -1.29208e+00
+   5  off          7.94421e-04   2.45113e-02   7.07374e-04   3.97211e-04
+   7  scale        1.00262e+00   4.98279e-02   1.12041e-02   2.61545e-02
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  4.880e+03 -2.423e+03 -6.004e-01 -5.804e-02  1.279e+00  2.740e+00 
+ -2.423e+03  4.996e+03  4.734e-01  4.576e-02 -1.009e+00 -2.160e+00 
+ -6.004e-01  4.734e-01  1.310e-04  1.211e-05 -2.791e-04 -5.960e-04 
+ -5.804e-02  4.576e-02  1.211e-05  3.193e-04 -2.587e-05 -5.520e-05 
+  1.279e+00 -1.009e+00 -2.791e-04 -2.587e-05  6.008e-04  1.270e-03 
+  2.740e+00 -2.160e+00 -5.960e-04 -5.520e-05  1.270e-03  2.721e-03 
+ERR MATRIX NOT POS-DEF
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.75438   1.000 -0.491 -0.751 -0.046  0.747  0.752
+        2  0.59083  -0.491  1.000  0.585  0.036 -0.582 -0.586
+        3  0.99878  -0.751  0.585  1.000  0.059 -0.995 -0.998
+        4  0.05936  -0.046  0.036  0.059  1.000 -0.059 -0.059
+        5  0.99503   0.747 -0.582 -0.995 -0.059  1.000  0.993
+        7  0.99840   0.752 -0.586 -0.998 -0.059  0.993  1.000
+ ERR MATRIX NOT POS-DEF
+[#1] INFO:Minization -- RooMinuit::optimizeConst: deactivating const optimization
+Plotting versus Mmiss
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+3 THSRooFit::PlotDataModel() chi2 = 0.835764
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (Signal)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (BG)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+THSRooFit::Fit() 
+RooAddPdf::TotalPDF0[ Yld_Signal * Signal + Yld_BG * BG ] = 590346
+0x36ec740 : OBJ: RooCmdArg	Extended	Extended
+0x37afc30 : OBJ: RooCmdArg	NumCPU	NumCPU
+0x37c0fb0 : OBJ: RooCmdArg	Save	Save
+0x37bfd10 : OBJ: RooCmdArg	Warnings	Warnings
+0x38e7520 : OBJ: RooCmdArg	ExternalConstraints	ExternalConstraints
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  Including the following contraint terms in minimization: (AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+[#1] INFO:Fitting -- RooAddition::defaultErrorLevel(nll_TotalPDF0_Eg3.50_M18.75__with_constr) Summation contains a RooNLLVar, using its error level
+ **********
+ **    9 **SET NOWARNINGS           0
+ **********
+[#1] INFO:Minization -- RooMinuit::optimizeConst: activating const optimization
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  The following expressions will be evaluated in cache-and-track mode: (Signal,BG)
+ **********
+ **   12 **MIGRAD        4000           1
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ START MIGRAD MINIMIZATION.  STRATEGY  1.  CONVERGENCE WHEN EDM .LT. 1.00e-03
+ FCN=-100658 FROM MIGRAD    STATUS=INITIATE      152 CALLS         153 TOTAL
+                     EDM= unknown      STRATEGY= 1      NO ERROR MATRIX       
+  EXT PARAMETER               CURRENT GUESS       STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       6.73516e+02   6.98557e+01   0.00000e+00  -3.84202e+04
+   2  Yld_Signal   1.33015e+03   7.06795e+01   0.00000e+00  -5.03903e+04
+   3  alpha        9.76325e-01   9.17064e-01   2.95027e-01   9.79455e+01
+   4  alphaB       3.15638e-01   1.78179e-02   0.00000e+00  -1.36910e+01
+   5  off          1.03978e+00   2.45113e-02   0.00000e+00   9.02815e+03
+   7  scale        1.03173e+00   4.98279e-02   0.00000e+00  -3.09285e+02
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+ FCN=-126945 FROM HESSE     STATUS=OK             46 CALLS         819 TOTAL
+                     EDM=38.6913    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.55953e+03   1.13877e+02   1.89626e-03  -8.86741e+00
+   2  Yld_Signal   1.18927e+04   1.38976e+02   1.81476e-03   2.27305e+01
+   3  alpha        1.42979e-01   2.64434e-02   2.51532e-04  -1.15273e+02
+   4  alphaB       8.25441e-03   1.26213e-01   1.55533e-01  -1.19632e-02
+   5  off          4.39759e-03   3.73881e-03   2.62619e-04   4.22022e+01
+   7  scale        1.02610e+00   2.30496e-03   3.11624e-03   7.99366e+00
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ MIGRAD TERMINATED WITHOUT CONVERGENCE.
+ FCN=-126945 FROM MIGRAD    STATUS=FAILED       1026 CALLS        1027 TOTAL
+                     EDM=22.761    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.56247e+03   1.67202e+02  -0.00000e+00  -3.84524e+00
+   2  Yld_Signal   1.18742e+04   1.83053e+02   0.00000e+00   4.18297e+00
+   3  alpha        1.42516e-01   2.23348e-05  -0.00000e+00   7.67625e+03
+   4  alphaB       1.59155e-03   1.65044e-01  -0.00000e+00   3.59484e-03
+   5  off          4.51349e-03   6.17256e-05  -0.00000e+00   3.94107e+01
+   7  scale        1.02610e+00   4.77464e-06  -0.00000e+00   3.28706e+00
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  2.796e+04  1.154e+04  2.695e-04  2.638e-01  1.290e-03  6.146e-05 
+  1.154e+04  3.351e+04 -3.104e-04 -5.459e-01 -1.687e-03 -2.191e-04 
+  2.695e-04 -3.104e-04  4.988e-10  5.778e-08  1.304e-09  6.652e-12 
+  2.638e-01 -5.459e-01  5.778e-08  1.116e-03  3.206e-07  1.552e-07 
+  1.290e-03 -1.687e-03  1.304e-09  3.206e-07  3.810e-09  5.625e-11 
+  6.146e-05 -2.191e-04  6.652e-12  1.552e-07  5.625e-11  2.280e-11 
+ERR MATRIX NOT POS-DEF
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.80704   1.000  0.377  0.072  0.047  0.125  0.077
+        2  0.94053   0.377  1.000 -0.076 -0.089 -0.149 -0.251
+        3  0.98878   0.072 -0.076  1.000  0.077  0.946  0.062
+        4  0.99765   0.047 -0.089  0.077  1.000  0.155  0.973
+        5  0.98854   0.125 -0.149  0.946  0.155  1.000  0.191
+        7  0.99797   0.077 -0.251  0.062  0.973  0.191  1.000
+ ERR MATRIX NOT POS-DEF
+ **********
+ **   15 **HESSE        4000
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+ FCN=-126945 FROM HESSE     STATUS=OK             48 CALLS        1076 TOTAL
+                     EDM=0.00915366    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                INTERNAL      INTERNAL  
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE   
+   1  Yld_BG       5.56247e+03   1.08980e+02   1.89586e-03  -7.48997e-01
+   2  Yld_Signal   1.18742e+04   1.34850e+02   1.81282e-03  -3.24491e-01
+   3  alpha        1.42516e-01   6.28102e-05   5.03064e-04  -7.96579e-01
+   4  alphaB       1.59155e-03   8.67735e-01   1.27728e-01  -1.49099e+00
+   5  off          4.51349e-03   2.36504e-03   1.93314e-04   2.25674e-03
+   7  scale        1.02610e+00   8.67489e-04   2.09368e-04   2.64087e-01
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  1.188e+04 -6.307e+03 -4.950e-06  3.461e-08  2.595e-03  3.945e-03 
+ -6.307e+03  1.818e+04  4.954e-06 -6.789e-08 -2.596e-03 -3.946e-03 
+ -4.950e-06  4.954e-06  3.945e-09 -1.862e-15  6.645e-11  4.675e-12 
+  3.461e-08 -6.789e-08 -1.862e-15  2.936e-02  4.580e-12  3.311e-12 
+  2.595e-03 -2.596e-03  6.645e-11  4.580e-12  5.593e-06  8.092e-07 
+  3.945e-03 -3.946e-03  4.675e-12  3.311e-12  8.092e-07  7.526e-07 
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.43002   1.000 -0.429 -0.001  0.000  0.010  0.042
+        2  0.42943  -0.429  1.000  0.001 -0.000 -0.008 -0.034
+        3  0.00091  -0.001  0.001  1.000 -0.000  0.000  0.000
+        4  0.00000   0.000 -0.000 -0.000  1.000  0.000  0.000
+        5  0.39446   0.010 -0.008  0.000  0.000  1.000  0.394
+        7  0.39652   0.042 -0.034  0.000  0.000  0.394  1.000
+[#1] INFO:Minization -- RooMinuit::optimizeConst: deactivating const optimization
+Plotting versus Mmiss
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+4 THSRooFit::PlotDataModel() chi2 = 0.867314
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (Signal)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (BG)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+THSRooFit::Fit() 
+RooAddPdf::TotalPDF0[ Yld_Signal * Signal + Yld_BG * BG ] = 580322
+0x36ec740 : OBJ: RooCmdArg	Extended	Extended
+0x37afc30 : OBJ: RooCmdArg	NumCPU	NumCPU
+0x37c0fb0 : OBJ: RooCmdArg	Save	Save
+0x37bfd10 : OBJ: RooCmdArg	Warnings	Warnings
+0x38e7520 : OBJ: RooCmdArg	ExternalConstraints	ExternalConstraints
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  Including the following contraint terms in minimization: (AlphaConstrSignal,OffConstrSignal,ScConstrSignal,AlphaConstrBG)
+[#1] INFO:Fitting -- RooAddition::defaultErrorLevel(nll_TotalPDF0_Eg3.50_M18.75__with_constr) Summation contains a RooNLLVar, using its error level
+ **********
+ **    9 **SET NOWARNINGS           0
+ **********
+[#1] INFO:Minization -- RooMinuit::optimizeConst: activating const optimization
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  The following expressions will be evaluated in cache-and-track mode: (Signal,BG)
+ **********
+ **   12 **MIGRAD        4000           1
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ START MIGRAD MINIMIZATION.  STRATEGY  1.  CONVERGENCE WHEN EDM .LT. 1.00e-03
+ FCN=-126667 FROM MIGRAD    STATUS=INITIATE      305 CALLS         306 TOTAL
+                     EDM= unknown      STRATEGY= 1      NO ERROR MATRIX       
+  EXT PARAMETER               CURRENT GUESS       STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       3.26217e+03   1.08980e+02   0.00000e+00  -1.08075e+03
+   2  Yld_Signal   1.52261e+04   1.34850e+02   0.00000e+00   1.59388e+03
+   3  alpha        1.82704e-01   6.28102e-05  -1.53127e+00  -6.08493e+01
+   4  alphaB       3.92314e-01   8.67735e-01   0.00000e+00   1.37125e+01
+   5  off          1.50509e-02   2.36504e-03   0.00000e+00   2.93581e+02
+   7  scale        9.00003e-01   8.67489e-04   0.00000e+00  -1.95029e-01
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+ FCN=-126938 FROM HESSE     STATUS=OK             46 CALLS         586 TOTAL
+                     EDM=0.7504    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.55173e+03   1.10298e+02   1.89371e-03   2.20222e+01
+   2  Yld_Signal   1.19741e+04   1.36746e+02   1.81026e-03   1.16419e+02
+   3  alpha        3.76928e-02   5.94916e-02   2.10480e-02   2.29237e+00
+   4  alphaB       1.19865e-01   3.90724e-02   2.40142e-02  -7.63665e-01
+   5  off         -9.14952e-03   4.28452e-04   1.33029e-04  -4.71831e+02
+   7  scale        1.01387e+00   7.30816e-04   4.48968e-03   2.70237e+00
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ MIGRAD TERMINATED WITHOUT CONVERGENCE.
+ FCN=-126939 FROM MIGRAD    STATUS=FAILED        775 CALLS         776 TOTAL
+                     EDM=0.0471278    STRATEGY= 1  ERROR MATRIX UNCERTAINTY  22.3 per cent
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Yld_BG       5.58572e+03   1.13228e+02   0.00000e+00   5.88429e+00
+   2  Yld_Signal   1.18529e+04   1.33019e+02  -0.00000e+00   5.68595e+00
+   3  alpha        2.99500e-04   3.56491e-02   0.00000e+00  -7.24704e-01
+   4  alphaB       1.19365e-01   4.02638e-02  -0.00000e+00   1.45205e-01
+   5  off         -5.99530e-03   2.93269e-03  -0.00000e+00  -9.16729e+01
+   7  scale        1.01466e+00   9.77215e-04  -0.00000e+00   1.06876e+01
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  1.282e+04 -5.047e+03  1.500e-01 -1.014e-01 -2.338e-02 -6.903e-03 
+ -5.047e+03  1.769e+04  6.375e-02  3.307e-01 -1.685e-02 -1.712e-02 
+  1.500e-01  6.375e-02  4.324e-05 -1.861e-05 -1.396e-05 -5.692e-07 
+ -1.014e-01  3.307e-01 -1.861e-05  1.630e-03  5.384e-06 -4.903e-07 
+ -2.338e-02 -1.685e-02 -1.396e-05  5.384e-06  8.601e-06  1.203e-06 
+ -6.903e-03 -1.712e-02 -5.692e-07 -4.903e-07  1.203e-06  9.550e-07 
+ERR MATRIX APPROXIMATE
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.45580   1.000 -0.335  0.201 -0.022 -0.070 -0.062
+        2  0.42404  -0.335  1.000  0.073  0.062 -0.043 -0.132
+        3  0.79105   0.201  0.073  1.000 -0.070 -0.724 -0.089
+        4  0.09899  -0.022  0.062 -0.070  1.000  0.045 -0.012
+        5  0.81848  -0.070 -0.043 -0.724  0.045  1.000  0.420
+        7  0.56394  -0.062 -0.132 -0.089 -0.012  0.420  1.000
+ ERR MATRIX APPROXIMATE
+ **********
+ **   15 **HESSE        4000
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ FCN=-126939 FROM HESSE     STATUS=NOT POSDEF     46 CALLS         823 TOTAL
+                     EDM=260.324    STRATEGY= 1      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE     INTERNAL      INTERNAL  
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE   
+   1  Yld_BG       5.58572e+03   1.32509e+02   1.89235e-03  -7.47178e-01
+   2  Yld_Signal   1.18529e+04   1.16752e+02   1.81055e-03  -3.25779e-01
+   3  alpha        2.99500e-04   9.82934e-01   5.00000e-01  -1.53618e+00
+   4  alphaB       1.19365e-01   2.04036e-02   2.89309e-02  -8.65270e-01
+   5  off         -5.99530e-03   6.80065e-02   8.43165e-05  -2.99766e-03
+   7  scale        1.01466e+00   1.53310e-01   1.52054e-02   1.47102e-01
+   8  scaleB       1.00000e+00   constant   
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  25    NPAR=  6    ERR DEF=0.5
+  1.756e+04 -1.246e+04  7.504e+00  3.986e-01 -8.269e+00  1.594e+01 
+ -1.246e+04  1.363e+04 -6.048e+00 -3.213e-01  6.665e+00 -1.284e+01 
+  7.504e+00 -6.048e+00  3.765e-03  1.983e-04 -4.124e-03  7.963e-03 
+  3.986e-01 -3.213e-01  1.983e-04  4.169e-04 -2.196e-04  4.211e-04 
+ -8.269e+00  6.665e+00 -4.124e-03 -2.196e-04  4.627e-03 -8.762e-03 
+  1.594e+01 -1.284e+01  7.963e-03  4.211e-04 -8.762e-03  1.690e-02 
+ERR MATRIX NOT POS-DEF
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      7
+        1  0.92601   1.000 -0.805  0.923  0.147 -0.917  0.925
+        2  0.84827  -0.805  1.000 -0.844 -0.135  0.839 -0.846
+        3  0.99829   0.923 -0.844  1.000  0.158 -0.988  0.998
+        4  0.15880   0.147 -0.135  0.158  1.000 -0.158  0.159
+        5  0.99097  -0.917  0.839 -0.988 -0.158  1.000 -0.991
+        7  0.99870   0.925 -0.846  0.998  0.159 -0.991  1.000
+ ERR MATRIX NOT POS-DEF
+[#1] INFO:Minization -- RooMinuit::optimizeConst: deactivating const optimization
+Plotting versus Mmiss
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+5 THSRooFit::PlotDataModel() chi2 = 0.854036
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (Signal)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (BG)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+THSRooFit::RunWeightsMany  Likelihoods 
+-126940
+-126940
+-126939
+-126945
+-126939
+THSRooFit::RunWeightsMany() Best likelihood was -126945 3 so use those parameters
+
+  RooFitResult: minimized FCN value: -126945, estimated distance to minimum: 0.00915366
+                covariance matrix quality: Full, accurate covariance matrix
+                Status : 
+
+    Floating Parameter    FinalValue +/-  Error   
+  --------------------  --------------------------
+                Yld_BG    5.5625e+03 +/-  1.09e+02
+            Yld_Signal    1.1874e+04 +/-  1.35e+02
+                 alpha    1.4252e-01 +/-  6.28e-05
+                alphaB    1.5916e-03 +/-  8.68e-01
+                   off    4.5135e-03 +/-  2.37e-03
+                  offB    0.0000e+00 +/-  0.00e+00
+                 scale    1.0261e+00 +/-  8.67e-04
+                scaleB    1.0000e+00 +/-  0.00e+00
+
+Yld_Signal 11874.2
+Yld_BG 5562.47
+RooAddPdf::TotalPDF0[ Yld_Signal * Signal + Yld_BG * BG ] = 580322
+RooArgList:: = (Yld_Signal,Yld_BG)
+Entries 17432
+THSsPlot::sPlot() about to start
+RooDataSet::Eg3.50_M18.75_[Mmiss,fgID] = 17432 entries
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Minization --  The following expressions have been identified as constant and will be precalculated and cached: (Signal,BG)
+[#1] INFO:Fitting -- RooAbsPdf::fitTo(TotalPDF0) Calculating sum-of-weights-squared correction matrix for covariance matrix
+[#1] INFO:InputArguments -- Printing Yields
+RooArgList:: = (Yld_Signal,Yld_BG)
+[#1] INFO:InputArguments -- yield in pdf: Yld_Signal 11871.6
+[#1] INFO:InputArguments -- yield in pdf: Yld_BG 5560.42
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Eval -- Checking Likelihood normalization:  
+[#1] INFO:Eval -- Yield of specie  Sum of Row in Matrix   Norm
+[#1] INFO:Eval -- 11871.6 11871.7 0.999997
+[#1] INFO:Eval -- 5560.42 5560.36 1
+[#1] INFO:Eval -- Calculating sWeight
+RooDataSet::Eg3.50_M18.75_[Mmiss,fgID,Yld_Signal_sw,L_Yld_Signal,Yld_BG_sw,L_Yld_BG] = 17432 entries
+void THSsPlot::sPlot() Total Yield after fit 17432
+THSWeights::SetFile .//WeightsEg3.50_M18.75_.root
+THSsPlot:ExportWeights 
+Insert species Signal 0 0
+Insert species BG 1 0
+RooDataSet::Eg3.50_M18.75_[Mmiss,fgID,Yld_Signal_sw,L_Yld_Signal,Yld_BG_sw,L_Yld_BG] = 17432 entries
+RooDataSet::Eg3.50_M18.75_[Mmiss,fgID,Yld_Signal_sw,L_Yld_Signal,Yld_BG_sw,L_Yld_BG] = 17432 entries
+Plotting versus Mmiss
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+6 THSRooFit::PlotDataModel() chi2 = 0.867253
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (Signal)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) directly selected PDF components: (BG)
+[#1] INFO:Plotting -- RooAbsPdf::plotOn(TotalPDF0) indirectly selected PDF components: ()
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(Signal_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(BG_Int[Mmiss]) using numeric integrator RooIntegrator1D to calculate Int(Mmiss)
+Map HSsWeights contains 17432 events associated file is .//WeightsEg3.50_M18.75_.root 
+Species are : 
+BG
+Signal
+The first ten entries are :
+25 1.08101 -0.0810111 
+31 1.18255 -0.182548 
+46 1.11527 -0.115266 
+48 -0.9725 1.97249 
+68 0.845748 0.154253 
+74 -0.377138 1.37713 
+77 0.732421 0.26758 
+83 1.157 -0.156997 
+84 1.01984 -0.0198379 
+87 1.20126 -0.201255 
+Warning in <TTreeFormula::DefinedVariable>: Casting to primary types like "Long64_t" is not supported yet
+THSWeights::BuildIndex 17432
+Done
+THSWeights::SortWeights() reordering trees 0x392d560
+THSWeights::SortWeights() reordering trees
+THSWeights::SortWeights() entries 17432 17432
+THSWeights::SortWeights Print new ordering
+Map HSsWeights contains 17432 events associated file is .//WeightsEg3.50_M18.75_.root 
+Species are : 
+BG
+Signal
+The first ten entries are :
+25 1.08101 -0.0810111 
+31 1.18255 -0.182548 
+46 1.11527 -0.115266 
+48 -0.9725 1.97249 
+68 0.845748 0.154253 
+74 -0.377138 1.37713 
+77 0.732421 0.26758 
+83 1.157 -0.156997 
+84 1.01984 -0.0198379 
+87 1.20126 -0.201255 
+void THSWeights::Save() 0x392d560
+0x3b12bb0 0x3d2aea0
+ THSWeights::Save() .//WeightsEg3.50_M18.75_.root 
+******************************************************************************
+*Tree    :HSsWeights_W: Tree weights for each species                          *
+*Entries :    17432 : Total =          345350 bytes  File  Size =     242780 *
+*        :          : Tree compression factor =   1.05                       *
+******************************************************************************
+*Br    0 :Signal    : Signal/D                                               *
+*Entries :    17432 : Total  Size=     172538 bytes  File Size  =     120237 *
+*Baskets :        4 : Basket Size=      32000 bytes  Compression=   1.06     *
+*............................................................................*
+*Br    1 :BG        : BG/D                                                   *
+*Entries :    17432 : Total  Size=     172498 bytes  File Size  =     122543 *
+*Baskets :        4 : Basket Size=      32000 bytes  Compression=   1.04     *
+*............................................................................*
+******************************************************************************
+*Tree    :HSsWeights_ID: event ids for each entry                               *
+*Entries :    17432 : Total =          172831 bytes  File  Size =      34288 *
+*        :          : Tree compression factor =   3.73                       *
+******************************************************************************
+*Br    0 :WID       : WID/L                                                  *
+*Entries :    17432 : Total  Size=     172518 bytes  File Size  =      34288 *
+*Baskets :        4 : Basket Size=      32000 bytes  Compression=   3.73     *
+*............................................................................*
+THSWeights::Save() Saved weights to file

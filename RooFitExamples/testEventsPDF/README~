@@ -1,0 +1,144 @@
+This example implements a PDF based on simulated or sideband data in a custom
+class THSEventsPDF. Signal and background events are genreated and used in
+constructing the models which are then fit to the "data" and sWeights calculated.
+The second part of this example shows how fits can be split up and run in batch
+mode, in particular on a CPU farm
+/////////////////////////////////////////////////////////////////////
+MODEL
+To produce test data, and signal/background events run the macro :
+root 'Model1.C( "Data.root" )'
+
+This should produce 3 root files. One the quasi-data, Data.root and the other
+2 are equivalent to simulated models for Signal and Background: SigData.root
+and BGData.root.
+The data consists of the follwing kinematic branches :
+  tree->Branch("Eg",&Eg,"Eg/D");
+  tree->Branch("Mmiss",&Mmiss,"Mmiss/D");
+  tree->Branch("M1",&M1,"M1/D");
+  tree->Branch("Mmiss_M1",&Mmiss_M1,"Mmiss_M1/D");
+  tree->Branch("M2",&M2,"M2/D");
+The next branch is required in all HSRooFit applications and allows
+synchroisation of events and weights
+  tree->Branch("fgID",&fgID,"ID/D");
+The last branch is a cheat which would not normally exist in real data and just
+identifies whether the event is actually signal or background. This can be useful for drawing pure signal histograms to comapre with weighted distrubutions after.
+  tree->Branch("Sig",&Sig,"Sig/D");
+//////////////////////////////////////////////////////////////////////
+FarmHSEventsPDFBins.C
+To run the macro you just need to type > root FarmHSEventsPDFBins.C
+This assumes you have set the enviroment variable HSANA to where the HS source
+code is.
+The first lines in the macro just load the necessary classes from the HS code.
+
+Next create the THSEventsFit object. This contains the standard HS sPlot
+functionality with additional organisation for the THSEventsPDF pdf class
+  THSEventsFit* RF=new THSEventsFit("SF"); //SF is arbitrary name...
+
+Give an output directory for storing root files with binning information,
+plots, weights etc.
+  RF->SetOutDir("outBins/");
+It is recommened to apply Gaussian constraints to the EventsPDF tuning
+paramters alpha, off, scale. If they reach their limits then it is not
+garunteed to produce a reliable error matrix. The range given to these
+paramters when declared is therore important as it relates to the width
+of the Gaussian constraint, while the initial value is taken as the mean.
+This is automated by the line :
+  RF->SetWithConstraints(); //Use Gaussian contraints on alpha,off,scale
+Declare the variable to be fitted. Here it is the missing mass of the model data which was constructed as a Gaussian for the signal and linear polynomial for the background. [2,8] declares the full range i.e. events outwith this range will not be include in the fit dataset even if they exist in the tree
+  RF->LoadVariable("Mmiss[2,8]");//should be same name as variable in tree
+Split the data up into many fits by defining bins  for the following variables
+Note is is also possible to give an array f bin limits for variable bin sizes
+  RF->LoadBinVars("Eg",1,3,4);//1 bin between 3 and 4 
+  RF->LoadBinVars("M1",4,0,10);//4 bins between 0 and 10
+
+Now we can build the PDFs for fitting. These can also be any standard RooFit pdf
+but here we use the THSEventsPDF class for loading in simulated models
+
+   //Make Model Signal
+The first line creates the PDF via the RooFit WorkSpace factory system
+Here THSEventsPDF is the name of the class; Signal is the name this instance
+will be referred to as (the subsequent weights and yield paramter will also be
+labelled with Signal); Mmiss should be the same as the fit variable loaded above; alpha[0,0,1] is the additional smearing "fudge" parameter initial value 0, range 0-1, alpha is the width of the Gaussian convoluted with the shape derived from the model signal events; off is just an x-offset applied to the simulated events; scale is a scale factor applied to the x axis making the distribution broader or narrower but retaining it features; 100 is the number of bins in the RooHisPdf used to store the events pdf (this can be larger if there are many events, 20 is the number of histgrams made with different alpha for extrapolating the Guassian smearing parameter alpha. In general a fit make require some user optimisation of all of this values. 
+  RF->Factory("THSEventsPDF::Signal(Mmiss,alpha[0,0,1],off[0,-2,2],scale[1.,0.9,1.1],100,20)");
+Load in the model events for the signal via a TChain or TTree  
+  TChain *chainmcL=new TChain("MyModel","mcsignal");
+  chainmcL->Add("SigData.root");
+The Signal in the line below must match the name of the THSEventsPDF above   
+  RF->SetModelEventsTree("Signal",chainmcL);
+The next line is required for all PDFs you want to include in the fit  
+  RF->LoadSpeciesPDF("Signal",1);
+And similar for background
+After the PDFs are defined we load the data via a TChain
+  TChain chain("MyModel");
+  chain.Add("Data.root");
+Important: include the name of the event ID branch to allow synchronisation. This needs to be a branch in the tree which is a double although it will essentially just contain an integer value, different for each event.  
+  RF->SetIDBranchName("fgID");
+Give the data to HSRooFit
+  RF->LoadDataSet(&chain);
+Do the fitting and weighting ! The number given to this function results in that many "trial fits" being performed to find the best model parameters ahead of the actual sWeights fit where all parameters apart from Yields are fixed. If there are bins defined the fits will be done for each one and results and weights saved for each one in the ouput directory.
+  RF->RunWeights(2); //Do 5 parameter fits and take the "best"
+
+Draw some of the other variables in the data tree with the new weights 
+  RF->DrawTreeVar("Mmiss",100,0,10);
+  RF->DrawTreeVar("M1",100,0,10);
+  RF->DrawTreeVar("M2",100,0,10);
+Save any plots associated with the overall RF object, here it is just the drawn variables in the line above.
+  RF->SavePlots("");
+Save the overall weights in one file contaiing all the individual bins.
+  RF->GetWeights()->Save();
+
+Results
+After Running the macro the output directory should contain the following files:
+BinsBG.root                 ResultsSF.root
+BinsSignal.root             WeightsEg3.50_M11.25_.root
+DataEntries.root            WeightsEg3.50_M13.75_.root
+ResultsEg3.50_M11.25_.root  WeightsEg3.50_M16.25_.root
+ResultsEg3.50_M13.75_.root  WeightsEg3.50_M18.75_.root
+ResultsEg3.50_M16.25_.root  WeightsEg3.50_M19.00_.root
+ResultsEg3.50_M18.75_.root  WeightsSF.root
+ResultsEg3.50_M19.00_.root
+
+DataEntries.root contains event indexes for each bin you split the fits into
+BinsBG.root same but for events in the BG tree
+BinsSignal.root same but for events in the Singal tree
+The above 3 files make sure the simulated models correspond to the same bin as
+the data being fitted
+ResultsEg3.50_M11.25_.root Contains the fit plots and fit parameters of the fit in this bin centered on Eg=3.5 and M1=1.25
+WeightssEg3.50_M11.25_.root Contains the weight trees for events in this bin
+ResultsSF.root contains plots associated with the overall RF object
+WeightsSF.root contains weights for all events fitted, rather than just individual bins.
+NOTE these files have been copied to the OrigoutBins directory if you want to check them
+/////////////////////////////////////////////////////////////////////
+Using the THSWeights object
+The macro DrawWithWeights.C demonstrates how the produced weights can be used to draw varibales from a tree. It uses a binary search algorithm to find the event by it ID value, this seems to be reasonably fast, although other faster methods are avaialble in the THSWeights class, this is safest.
+First load a saved weights tree to a THSWEights object
+  THSWeights* wts=new THSWeights("TotalWeights");
+  wts->LoadSaved("outBins/WeightsSF.root","WeightMap");
+Get the ID branch from the tree you want to draw a variable from
+  chain.SetBranchAddress("fgID",&ID);
+Loop over all the events in the tree and get the Signal and BG weight for each event
+   if(wts->GetEntryBinarySearch(ID))//If no weight for this event return FALSE
+        histM1S->Fill(M1,wts->GetWeight("Signal"));
+        histM1B->Fill(M1,wts->GetWeight("BG"));
+ 
+   
+////////////////////////////////////////////////////////////////////
+Part 2 : Creating Jobs for batch/farm
+The configuration for this is identical, the only difference is that rather than RunWeights you call PrepareForFarm(). This creates a seperate job for each bin that was defined with the LoadBinVar function.
+This is demonstrated in the macro FarmHSEventsPDF.C
+
+Once the macro has completed each job can be sent to a farm (or run individually on your desktop by removing the qsub part) by running HSSubmitBatch.C
+So if I ran FarmHSEventsPDF.C with output directory outBinsFarm I run root from the command line :
+root 'HSSubmitBatch.C(TString(gSystem->Getenv("PWD"))+"/outBinsFarm/")'
+
+Some fine tuning of fit parameters etc. can be performed in the HSRunBatchSW.C macro, as well as the number of fit attempts to try to get the best parameters.
+
+To get this to run it is of course necessary to prepare some, for example, pbs script to run on the farm node. An example is given here in the pbs_run script which will need edited before running.
+////////////////////////////////////////////////
+After batch running.
+The results in the output directory should be similar to before, the only thing missing is the overall Results and Weights files. Once all the jobs are finished it is possible to combine all the weights into one file again and draw variables from a tree or other actions as before in the DrawWithWeights.C macro.
+This is shown in the DrawFarm.C macro which first combines the weight files into 1 before drawing.
+  THSWeights* wts=new THSWeights("TotalWeights");
+  wts->Merge("outBinsFarm/WeightsEg","outBins0/WeightsTotal.root","HSsWeights");
+
+The above line takes all the files starting with WeightsEg in the directory outBinsFarm and merges them into 1 weights tree in WeightsTotal.root with the name HSsWeights. The rest is as for the previous case. Of coures once this has been done once the merged weight file exists and it is not necessary to do this again, instead you can go back to the LoadSaved method in DrawWithWeights.C.
