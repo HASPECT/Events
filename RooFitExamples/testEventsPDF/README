@@ -110,6 +110,8 @@ WeightsSF.root contains weights for all events fitted, rather than just individu
 NOTE these files have been copied to the OrigoutBins directory if you want to check them
 /////////////////////////////////////////////////////////////////////
 Using the THSWeights object
+You can use the HS TSelector code for making histograms, just set IsHisto and IsSW = kTRUE in ConfigSel.c
+OR
 The macro DrawWithWeights.C demonstrates how the produced weights can be used to draw varibales from a tree. It uses a binary search algorithm to find the event by it ID value, this seems to be reasonably fast, although other faster methods are avaialble in the THSWeights class, this is safest.
 First load a saved weights tree to a THSWEights object
   THSWeights* wts=new THSWeights("TotalWeights");
@@ -136,6 +138,7 @@ Some fine tuning of fit parameters etc. can be performed in the HSRunBatchSW.C m
 To get this to run it is of course necessary to prepare some, for example, pbs script to run on the farm node. An example is given here in the pbs_run script which will need edited before running.
 ////////////////////////////////////////////////
 After batch running.
+
 The results in the output directory should be similar to before, the only thing missing is the overall Results and Weights files. Once all the jobs are finished it is possible to combine all the weights into one file again and draw variables from a tree or other actions as before in the DrawWithWeights.C macro.
 This is shown in the DrawFarm.C macro which first combines the weight files into 1 before drawing.
   THSWeights* wts=new THSWeights("TotalWeights");
