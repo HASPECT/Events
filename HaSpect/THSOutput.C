@@ -113,6 +113,11 @@ void THSOutput::HSSlaveTerminate(){
   FinishOutput();
 }
 void THSOutput::HSTerminate(){
+
+  return;
+  //TURN OFF saving of code and entrylists
+  //LEave code here as might prove useful in the future
+
   //This function is a bit messy, mainly due to allowing different configurations
   //of analysis to use the same code, e.g. proof or not, many files or one
   if(fOutName.EndsWith(".root")){//Just one file

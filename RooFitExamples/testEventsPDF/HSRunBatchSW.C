@@ -3,12 +3,14 @@ void HSRunBatchSW(TString JobName){
   gROOT->LoadMacro("THSBins.C++");
   gROOT->LoadMacro("THSWeights.C++");
   gROOT->LoadMacro("THSRooFit.C++");
+  gROOT->LoadMacro("THSsPlot.C++");
+  gROOT->LoadMacro("THSEventsPDF.C++");
 
   TFile *JobFile = TFile::Open(TString("Farm")+JobName+".root");
   JobFile->ls();
   RooWorkspace* WS1=(RooWorkspace*)JobFile->Get("wHS");
-  THSRooFit* RF=new THSRooFit(JobName);
-  RF->SetBinnedFit(); //Make it much faster binned chi2 for parameters
+  THSsPlot* RF=new THSsPlot(JobName);
+  // RF->SetBinnedFit(); //Make it much faster binned chi2 for parameters
 
   WS1->Print();
   RF->SetOutDir("./");

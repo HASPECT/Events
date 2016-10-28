@@ -4,11 +4,11 @@
 #PBS -M Derek.Glazier@glasgow.ac.uk
 #PBS -l walltime=100:00:00
 #PBS -V
-
 #Make a directory to work in
-#!!!!!You will need to change this to something sensible!
-mkdir -p /home/dglazier/$JOBNAME
-cd /home/dglazier/$JOBNAME
+#mkdir -p /home/dglazier/$JOBNAME
+#cd /home/dglazier/$JOBNAME
+mkdir -p /scratch/dglazier/$JOBNAME
+cd /scratch/dglazier/$JOBNAME
 
 echo ' analysing bin ' $JOBNAME
 echo $HOST
@@ -18,23 +18,30 @@ setenv INPUT "Farm"$JOBNAME".root"
 setenv LOG "Farm"$JOBNAME".log"
 
 #copy data and analysis files
-cp $FILEDIR/$INPUT .
+scp dglazier@npc72:$FILEDIR/$INPUT .
 cp $RUNMAC .
-
-cp $HSANA/../RooFitExamples/testSimple/THSRooFit.* .
-cp $HSANA/../RooFitExamples/testSimple/THSBins.* .
-cp $HSANA/../RooFitExamples/testSimple/THSWeights.* .
+cp $HSANA/THSRooFit.C .
+cp $HSANA/THSBins.C .
+cp $HSANA/THSRooFit.h .
+cp $HSANA/THSBins.h .
+cp $HSANA/THSWeights.C .
+cp $HSANA/THSWeights.h .
+cp $HSANA/THSsPlot.C .
+cp $HSANA/THSsPlot.h .
+cp $HSANA/THSEventsPDF.C .
+cp $HSANA/THSEventsPDF.h .
 
 ls -lh 
 #run job in root batch mode
-#root -b -q 'HSRunBatchSW.C(TString(gSystem->Getenv("JOBNAME")))' >& $LOG
-root -b -q 'HSRunBatchSW.C(TString(gSystem->Getenv("JOBNAME")))' 
+#root -b -q '$RUNMAC(TString(gSystem->Getenv("JOBNAME")))' 
+root -b -q '$RUNMAC(TString(gSystem->Getenv("JOBNAME")))'  >& $LOG
 
 #copy output files to destination
-cp Plots* $FILEDIR/.
-cp Weights* $FILEDIR/.
-cp $LOG $FILEDIR/.
+scp Results* dglazier@npc72:$FILEDIR/.
+scp Weights* dglazier@npc72:$FILEDIR/.
+scp $LOG dglazier@npc72:$FILEDIR/.
 
+ls -lh 
 
 #tidy up
 cd ../

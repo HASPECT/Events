@@ -20,6 +20,7 @@ class THSBins : public TNamed{
   TTree* fBinTree;
   VecString_t fBinNames;//names of individual bins
   VecAxis_t fVarAxis;//bin limits for variables
+  vector<VecString_t> fPartName; //vector containing name part for each axis
   TFile* fFile;//! file for writing lists to disc in case they get large
   Int_t fNbins;//number of bins
   Int_t fNaxis;//number of axis
@@ -29,7 +30,7 @@ class THSBins : public TNamed{
  THSBins() : fBinTree(0),fFile(0),fNaxis(0),fNbins(0) {};
   THSBins(TString name,TString filename);
   THSBins(const THSBins& other, const char* name=0);
-
+ 
   THSBins(TString name);
   ~THSBins();
 
@@ -40,7 +41,11 @@ class THSBins : public TNamed{
   void IterateAxis(Int_t iA,TString binName);
   VecString_t GetBinNames(){return fBinNames;}
   VecAxis_t GetVarAxis(){return fVarAxis;}
+  Int_t GetAxisi(TString aname){for(Int_t ia=0;ia<fNaxis;ia++) if(fVarAxis[ia].GetName()==aname) return ia; return -1;};
+  TAxis GetAxis(Int_t ia){return fVarAxis[ia];}
   TString GetBinName(Int_t i){if(i<fNbins) return fBinNames[i];else return "";};
+  TString GetPartName(Int_t ia,Int_t ib){return fPartName[ia][ib];}
+  Int_t GetParti(Int_t ia,TString name){for(Int_t ib=0;ib<fVarAxis[ia].GetNbins();ib++){if(name==fPartName[ia][ib]) return ib;} return 0;} //find the bin index for a binpart name
   void InitialiseBinTree(TString name,TString filename);
   void Save();
   void RunBinTree(TTree* tree);

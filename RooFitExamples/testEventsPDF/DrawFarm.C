@@ -1,7 +1,8 @@
 {
-  gROOT->LoadMacro("../testSimple/THSWeights.C+");
+  gROOT->LoadMacro("$HSANA/THSWeights.C+");
+  //First merge all the ouput bins
   THSWeights* wts=new THSWeights("TotalWeights");
-  wts->Merge("outBins0/WeightsEg","outBins0/WeightsTotal.root","HSsWeights");
+  wts->Merge("outBinsFarm/WeightsEg","outBinsFarm/WeightsTotal.root","HSsWeights");
   
   TChain chain("MyModel");
   chain.AddFile("Data.root");

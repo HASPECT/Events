@@ -9,7 +9,7 @@
 //Set PROOF parameters
 //Set entrylist if required
 
-TProof* HSControl(Bool_t UsePROOF=kFALSE,Bool_t RECompile=kTRUE){
+TProof* HSControl(Int_t UsePROOF=0,Bool_t RECompile=kTRUE){
   //////////////Set path to THSParticle.h etc.
   TString HSANA=gSystem->Getenv("HSANA");
   gInterpreter->AddIncludePath(HSANA);
@@ -35,7 +35,7 @@ TProof* HSControl(Bool_t UsePROOF=kFALSE,Bool_t RECompile=kTRUE){
     // gROOT->LoadMacro(HSANA+"/THSBins.C+");
     // gROOT->LoadMacro(HSANA+"/THSEventsPDF.C+");
     // gROOT->LoadMacro(HSANA+"/THSRooFit.C+");
-   gROOT->LoadMacro(HSANA+"/THSWeights.C++");
+   gROOT->LoadMacro(HSANA+"/THSWeights.C+");
   }
    ////////////////////////////////////////////////
   
@@ -46,13 +46,13 @@ TProof* HSControl(Bool_t UsePROOF=kFALSE,Bool_t RECompile=kTRUE){
      //  plite->SetParameter("PROOF_UseTreeCache", 0); //turn off caching =0
      // plite->SetParameter("PROOF_CacheSize", 1000M);
      plite->SetParameter("PROOF_UseMergers", 0);//seems to be a bit faster initialising, for when you have lots of histograms
-     plite->SetParallel(4); //restrict to 2 workers
+     plite->SetParallel(UsePROOF); //restrict workers
      plite->Load(HSANA+"/THSParticle.C+");
      plite->Load(HSANA+"/THSHisto.C+");
      plite->Load(HSANA+"/THSOutput.C+");
      plite->Load(HSANA+"/THSEventWeighter.C+");
      plite->Load(HSANA+"/THSLongPS.C+");
-     plite->LoadMacro(HSANA+"/THSWeights.C+");
+     plite->Load(HSANA+"/THSWeights.C+");
  
    }
    return plite;

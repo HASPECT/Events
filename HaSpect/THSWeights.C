@@ -9,8 +9,8 @@ ClassImp(THSWeights);
 THSWeights::THSWeights(TString name) :TNamed(name,name),fWTree(0),fWeightList(0),fFile(0),fIDi(0),fIDv(0){
   fWTree=new TTree(name+"_W","Tree weights for each species");
   fWTree->SetDirectory(0);
-  fWTree->SetCacheSize(1E9);
   fIDTree=new TTree(name+"_ID","event ids for each entry");
+  fIDTree->SetDirectory(0);
   fIDTree->Branch("WID",&fID,"WID/L");
   fCurrEntry=0;
   fIsSorted=kFALSE;
@@ -20,8 +20,8 @@ THSWeights::THSWeights(TString name) :TNamed(name,name),fWTree(0),fWeightList(0)
 THSWeights::~THSWeights(){
   if(fWeightList) delete fWeightList;
   //if(fWTree) delete fWTree;
-  //if(fIDTree) delete fIDTree;
-  if(fFile) {delete fFile;}
+  // if(fIDTree) delete fIDTree;
+  // if(fFile) {delete fFile;}
 }
 void THSWeights::SetSpecies(TString name){
   UInt_t NSpecies=fSpecies.size(); 
@@ -74,6 +74,7 @@ Bool_t THSWeights::GetEntryBinarySearch(Long64_t id){
 Long64_t THSWeights::Merge(TString tempName,TString outName,TString wmName){
   //THSWeights* WM=new THSWeights();
   //WM->Merge("dirname/prefix","outfile","WeightMap")
+  //Function to merge weights from many root files
   if(outName!=TString("")) {
     //TFile* outFile=new TFile(outName,"recreate");
     SetFile(outName);
@@ -92,12 +93,15 @@ Long64_t THSWeights::Merge(TString tempName,TString outName,TString wmName){
     if(!fileName.Contains(prefix))continue;
     if(!fileName.Contains(".root"))continue;
     cout<<"THSWeights::Merge Adding file "<<fileName<<endl;
-    TFile* wfile=new TFile(dirName+"/"+fileName);
-    THSWeights* wm=(THSWeights*)wfile->Get(wmName);
+    //TFile* wfile=new TFile(dirName+"/"+fileName);
+    //THSWeights* wm=(THSWeights*)wfile->Get(wmName);
+    THSWeights* wm=new THSWeights();
+    wm->LoadSaved(dirName+"/"+fileName,wmName);
+    // wm->LoadSavedOld(dirName+"/"+fileName,wmName);
     Add(wm);
     delete wm;
-    wfile->Close();
-    delete wfile;
+    //wfile->Close();
+    //delete wfile;
   }
   gSystem->FreeDirectory(dir);
   
@@ -156,9 +160,6 @@ void THSWeights::Add(THSWeights* Wts){
   //make a list of weights added, this can be used to select contributing entrylists
   if(!fWeightList) {fWeightList=new TList();fWeightList->SetOwner();}
   fWeightList->Add(new TNamed(Wts->GetTitle(),""));//include name of this bin
-  //fileName.ReplaceAll(".root","") ; //remove 
-  // fileName.ReplaceAll("Weights","");//remove
-  //fWeightList->Add(new TNamed(fileName,TString("")));//include name of this bin //remove
 
 }
 void THSWeights::PrintWeight(){
@@ -193,18 +194,20 @@ void THSWeights::BuildIndex(){
   fIDi=index->GetIndex();//entry numbers
   fIDv=index->GetIndexValues();//id values
   fN=fWTree->GetEntries();
+  cout<<"Done"<<endl;
 }
 void THSWeights::SortWeights(){
   //GetEntryFast only works properly on trees where the ID is in order
   //This is not garunteed particualrly if weights are merged from different bins
   //reorder here
+  TTree* idtree=fIDTree->CloneTree(0); //create empty tree with branch adresses set //Clone before create index so do not have to save index
+  idtree->SetDirectory(fFile); //set file to save memory
   BuildIndex();
-
-  TTree* Mwtree=fWTree->CloneTree(); //create clone tree in memory
+  TTree* Mwtree=fWTree->CloneTree(); //create clone tree in memory or very slow!
   Mwtree->SetDirectory(0);
-  TTree* wtree=Mwtree->CloneTree(0); //create empty tree with branch adresses set
-  TTree* idtree=fIDTree->CloneTree(0); //create empty tree with branch adresses set
-
+  TTree* wtree=fWTree->CloneTree(0); //create empty tree with branch adresses set
+  wtree->SetDirectory(fFile);//set file to save memory
+   
   cout<<"THSWeights::SortWeights() reordering trees "<<fWTree->GetDirectory()<<endl; 
   for( Long64_t i =  0; i < fN ; i++ ) {
      fID=fIDv[i];
@@ -220,8 +223,7 @@ void THSWeights::SortWeights(){
   delete Mwtree;
   fIDTree=idtree;
   fWTree=wtree;
-  fIDTree->SetDirectory(fFile);  
-  fWTree->SetDirectory(fFile);  
+  cout<<"THSWeights::SortWeights() entries "<<fIDTree->GetEntries()<<" "<<fWTree->GetEntries()<<endl;
   //resetbranch addresses
   fIDTree->SetBranchAddress("WID",&fID);
   for(UInt_t iss=0;iss<fSpecies.size();iss++)
@@ -230,7 +232,10 @@ void THSWeights::SortWeights(){
   
   cout<<"THSWeights::SortWeights Print new ordering"<<endl;
   PrintWeight();
-  BuildIndex();//build for new tree!
+  //reset index
+  fIDv=0;//these have been deleted with orig fIDTree
+  fIDi=0;
+  //  BuildIndex();//build for new tree!
   fIsSorted=kTRUE;
 }
 void THSWeights::SetFile(TString filename){
@@ -247,42 +252,42 @@ void THSWeights::Save(){
   if(!fFile) {cout<<"THSWeights::Save() no file associated with "<<GetName()<<" so not saved"<<endl;return;}
 
   cout<<" THSWeights::Save() "<<fFile->GetName()<<" "<<fFile->GetTitle()<<endl;
-  fWTree->SetDirectory(fFile);
+  fWTree->Print();
+  fIDTree->Print();
+  //  fWTree->SetDirectory(fFile);
   fFile->cd();
-  Write();
+  fWTree->Write();//Not can't just save whole object
+  fIDTree->Write(); //As 1GB limit on object buffers in TFile
+  Write();//save the rest(not trees) of the weights class
   fFile->Close();
   delete fFile;fFile=0;
   cout<<"THSWeights::Save() Saved weights to file"<<endl;
 
 }
-void THSWeights::Mem(){ //Load tree into memory
-  fWTree->SetDirectory(0);//take tree into memory
-  fIDTree->SetDirectory(0);
-  fCurrEntry=0;
-}
-void THSWeights::Disk(){ //Put trees back onto hard disk
-  if(fFile){
-    fIDTree->SetDirectory(fFile);
-    fWTree->SetDirectory(fFile);
-  }
-  else cout<<"THSWeights::Disk() No file set to keep trees"<<endl;
-}
 void THSWeights::LoadSaved(TString fname,TString wname){
   TDirectory* savedir=gDirectory;
   TFile* wfile=new TFile(fname);
   THSWeights* file_wts=(THSWeights*)wfile->Get(wname);//read into memory
+  fName=file_wts->GetName();
+  fTitle=file_wts->GetTitle();
   savedir->cd();
-  fWTree=(TTree*) file_wts->GetTree()->Clone();
+  TTree* tempTree=0;
+  tempTree=(TTree*)wfile->Get(wname+"_W");
+  fWTree=tempTree->CloneTree();
+  delete tempTree;
   fWTree->SetDirectory(0);
   fSpecies=file_wts->GetSpecies();
   fWVals.ResizeTo(fSpecies.size());
   for(UInt_t i=0;i<fSpecies.size();i++)
     fWTree->SetBranchAddress(GetSpeciesName(i),&fWVals[i]); 
 
-  fIDTree=(TTree*)file_wts->GetIDTree()->Clone();
+  tempTree=(TTree*)wfile->Get(wname+"_ID");
+  fIDTree=tempTree->CloneTree();
+  // fIDTree=(TTree*)file_wts->GetIDTree()->Clone();
+  delete tempTree;
   fIDTree->SetDirectory(0);
   fIDTree->SetBranchAddress("WID",&fID);
-
+ 
   fCurrEntry=0;
   fIsSorted=kFALSE;
   fN=fWTree->GetEntries();
@@ -290,3 +295,26 @@ void THSWeights::LoadSaved(TString fname,TString wname){
   wfile->Close();
   delete wfile;
 }
+// void THSWeights::LoadSavedOld(TString fname,TString wname){
+//   TDirectory* savedir=gDirectory;
+//   TFile* wfile=new TFile(fname);
+//   THSWeights* file_wts=(THSWeights*)wfile->Get(wname);//read into memory
+//   savedir->cd();
+//   fWTree=(TTree*) file_wts->GetTree()->Clone();
+//   fWTree->SetDirectory(0);
+//   fSpecies=file_wts->GetSpecies();
+//   fWVals.ResizeTo(fSpecies.size());
+//   for(UInt_t i=0;i<fSpecies.size();i++)
+//     fWTree->SetBranchAddress(GetSpeciesName(i),&fWVals[i]); 
+
+//   fIDTree=(TTree*)file_wts->GetIDTree()->Clone();
+//   fIDTree->SetDirectory(0);
+//   fIDTree->SetBranchAddress("WID",&fID);
+
+//   fCurrEntry=0;
+//   fIsSorted=kFALSE;
+//   fN=fWTree->GetEntries();
+//   delete file_wts;  
+//   wfile->Close();
+//   delete wfile;
+// }

@@ -1,5 +1,6 @@
 //run with
-// root 'HSSubmitBatch.C(TString(gSystem->Getenv("PWD"))+"/outBins0/")'
+// root 'HSSubmitBatch.C(TString(gSystem->Getenv("PWD"))+"/outBinsFarm/")'
+// note need ' '
 void HSSubmitBatch(TString fileDir){
   gROOT->LoadMacro("$HSANA/THSBins.C++");
   //Open file containing binning information in a THSBins
@@ -16,8 +17,8 @@ void HSSubmitBatch(TString fileDir){
     TString JobName=DataBins->GetBinName(i);
     cout<<"sending JobName "<<endl;
     gSystem->Setenv("JOBNAME",JobName);
-    // gSystem->Exec("qsub pbs_run");
-    gSystem->Exec("./pbs_run");
+    gSystem->Exec("qsub pbs_run");
+    //gSystem->Exec("./pbs_run");
     gSystem->Exec("sleep 2");
     cout<<" sent job "<< JobName<<endl;
   }

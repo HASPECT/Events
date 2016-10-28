@@ -10,6 +10,8 @@
 #include "RooAbsCategory.h"
 #include "RooDataHist.h"
 #include "RooHistPdf.h"
+#include "RooGaussian.h"
+#include "RooConstVar.h"
  
 #include "TTree.h"
 #include "TEntryList.h"
@@ -17,7 +19,7 @@
 
 class THSEventsPDF : public RooAbsPdf {
  public:
- THSEventsPDF() : fx_off(0),fx(0),falpha(0),fHist(0),fHistPdf(0), fRHist(0),fWeightHist(0), fTree(0) {cout<<"THSEventsPDF()"<<endl;} ; 
+ THSEventsPDF() : fx_off(0),fx(0),falpha(0),fHist(0),fHistPdf(0), fRHist(0),fWeightHist(0), fTree(0),fAlphaConstr(0),fOffConstr(0),fScaleConstr(0) {cout<<"THSEventsPDF()"<<endl;} ; 
   THSEventsPDF(const char *name, const char *title,
 	       RooAbsReal& _x,
 	       RooAbsReal& _alpha,
@@ -39,13 +41,18 @@ class THSEventsPDF : public RooAbsPdf {
   Long64_t AddSmearedModel(TTree* tree=0,RooArgList vars=RooArgList());
   TH2* GetModelHist(){return fRHist;}
   RooHistPdf* GetHistPdf(){return fHistPdf;}  
-  void SetModelHist(TH2F* his){ //set a user created morphing model (not smeared)
+  void SetModelHist(TH2D* his){ //set a user created morphing model (not smeared)
     fRHist=his;
     fHist = new RooDataHist(fRHist->GetName(),fRHist->GetName(),RooArgSet(*fx_off,*falpha),RooFit::Import(*fRHist));
     fHistPdf = new RooHistPdf(TString("PDF")+fRHist->GetName(),TString("PDF")+fRHist->GetName(),RooArgSet(*fx_off,*falpha),*fHist,1); ;
   }
   void SetWeightHist(TH1* hw,TString sx,TString sy=TString(""),TString sz=TString(""));
   Double_t GetDistWeight(Double_t wx,Double_t wy=0,Double_t wz=0);
+  //Return Gaussian constraint for alpha centred on 0 width =1/4*max 
+  RooGaussian* AlphaConstraint() {return fAlphaConstr;};
+  RooGaussian* OffConstraint() {return fOffConstr;};
+  RooGaussian* ScaleConstraint() {return fScaleConstr;};
+
  protected:
   void adjustBinning(Int_t* offset1=0) const;
   
@@ -62,14 +69,18 @@ class THSEventsPDF : public RooAbsPdf {
   
   RooDataHist* fHist;
   RooHistPdf* fHistPdf;
-  TH2F* fRHist;
+  TH2D* fRHist;
   TH1* fWeightHist;//allow tree distribution to be weighted by branch corresponing to axis in this histogram
   Double_t fMean;
   Double_t fOldScale;
   TTree* fTree;
   Int_t fNWdim;
  private:
-  
+  RooGaussian *fAlphaConstr;
+  RooGaussian *fOffConstr;
+  RooGaussian *fScaleConstr;
+
+
   ClassDef(THSEventsPDF,1) // RooFit PDF class constructed as histogram from tree of events
  };
  

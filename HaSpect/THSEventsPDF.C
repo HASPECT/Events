@@ -33,7 +33,10 @@ THSEventsPDF::THSEventsPDF(const char *name, const char *title,
   fHistPdf(0),
   fRHist(0),
   fWeightHist(0),
-  fTree(0)
+  fTree(0),
+  fAlphaConstr(0),
+  fOffConstr(0),
+  fScaleConstr(0)
 { 
   
   RooRealVar *rx=dynamic_cast<RooRealVar*>(&_x);
@@ -54,14 +57,27 @@ THSEventsPDF::THSEventsPDF(const char *name, const char *title,
   Int_t NbinX=NBins/rsmin;
   cout<<GetName()<<" THSEventsPDF::THSEventsPDF  hist ranges "<<rMin<<" to "<<rMax<<endl;
   if(NbinX<10) NbinX=10;
-   fRHist=new TH2F(TString("hmc_model_")+_x.GetName()+name,TString("MC model for ")+_x.GetName(),NbinX,rMin,rMax,NAlphBins,ra->getMin(),ra->getMax());
+   fRHist=new TH2D(TString("hmc_model_")+_x.GetName()+name,TString("MC model for ")+_x.GetName(),NbinX,rMin,rMax,NAlphBins,ra->getMin(),ra->getMax());
   fRHist->Sumw2();
-  //  fRHist=new TH2F(TString("hmc_model_")+_x.GetName()+name,TString("MC model for ")+_x.GetName(),NbinX,rx->getMin(),rx->getMax(),NAlphBins,ra->getMin(),ra->getMax());
+  //  fRHist=new TH2D(TString("hmc_model_")+_x.GetName()+name,TString("MC model for ")+_x.GetName(),NbinX,rx->getMin(),rx->getMax(),NAlphBins,ra->getMin(),ra->getMax());
   fx=new RooRealVar(_x.GetName(),"Vx",mid,x.min(),x.max());
   fx_off=new RooRealVar(_x.GetName(),"Vx_off",mid,rMin,rMax);
   falpha=new RooRealVar("Valpha","Valpha",0,alpha.min(),alpha.max());
-  
+
+  if(ra->getMax()-ra->getMin())fAlphaConstr=new RooGaussian(TString("AlphaConstr")+GetName(),"AlphaConstr",_alpha,RooFit::RooConst(ra->getVal()),RooFit::RooConst(ra->getMax()/4));
+  if(ro->getMax()-ro->getMin())fOffConstr=new RooGaussian(TString("OffConstr")+GetName(),"OffConstr",_offset,RooFit::RooConst(ro->getVal()),RooFit::RooConst((ro->getMax()-ro->getMin())/4/2));
+  if(rs->getMax()-rs->getMin())fScaleConstr=new RooGaussian(TString("ScConstr")+GetName(),"ScConstr",_scale,RooFit::RooConst(rs->getVal()),RooFit::RooConst((rs->getMax()-rs->getMin())/4/2));
+
+  if(fAlphaConstr)fAlphaConstr->Print();
+  if(fOffConstr)fOffConstr->Print();
+  if(fScaleConstr)fScaleConstr->Print();
   fNWdim=0;
+
+  // delete ra;
+  // delete rx;
+  // delete rs;
+  // delete ro;
+
 } 
 
 
@@ -78,7 +94,10 @@ THSEventsPDF::THSEventsPDF(const THSEventsPDF& other, const char* name) :
   fHistPdf(0),
   fRHist(0),
   fWeightHist(0),
-  fTree(0)
+  fTree(0),
+  fAlphaConstr(0),
+  fOffConstr(0),
+  fScaleConstr(0)
 { 
   
   // cout<<"Copy contructor "<<fHistPdf<<" "<<other.fHistPdf<<endl;
@@ -87,7 +106,10 @@ THSEventsPDF::THSEventsPDF(const THSEventsPDF& other, const char* name) :
   if(other.falpha)falpha=(RooRealVar*)other.falpha->Clone();
   if(other.fHist)fHist=(RooDataHist*)other.fHist->Clone();
   if(other.fHistPdf)fHistPdf=(RooHistPdf*)other.fHistPdf->Clone();
-  if(other.fRHist)fRHist=(TH2F*)other.fRHist->Clone();
+  if(other.fRHist)fRHist=(TH2D*)other.fRHist->Clone();
+  if(other.fAlphaConstr)fAlphaConstr=(RooGaussian*)other.fAlphaConstr->Clone();
+  if(other.fOffConstr)fOffConstr=(RooGaussian*)other.fOffConstr->Clone();
+  if(other.fScaleConstr)fScaleConstr=(RooGaussian*)other.fScaleConstr->Clone();
   fMean=other.fMean;
   fOldScale=other.fOldScale;
   fNWdim=other.fNWdim;
@@ -104,6 +126,9 @@ THSEventsPDF::~THSEventsPDF() {
   if(falpha)delete falpha;
   if(fHistPdf) delete fHistPdf;
   if(fWeightHist) delete fWeightHist;
+  if(fAlphaConstr) delete fAlphaConstr;
+  if(fOffConstr) delete fOffConstr;
+  if(fScaleConstr) delete fScaleConstr;
 }
 
 Double_t THSEventsPDF::evaluate() const 
@@ -116,9 +141,7 @@ Double_t THSEventsPDF::evaluate() const
   arg=arg-offset;
   fx_off->setVal(arg);
   falpha->setVal(Double_t(alpha));
-  // return  fHist->weight(RooArgSet(*fx_off,*falpha),1,kTRUE)*TMath::Gaus(offset,0,(offset.max()-offset.min())*0.2); //Guassian prior with width  1/5*range 
-  return  fHist->weight(RooArgSet(*fx_off,*falpha),1,kTRUE);//*TMath::Gaus(scale,1.,1);
- // return  fHist->weight(RooArgSet(*fx_off,*falpha),1,kTRUE)*TMath::Gaus(Double_t(alpha),0,alpha.max()/2);//alpha prior with width half the range
+  return  fHist->weight(RooArgSet(*fx_off,*falpha),1,kTRUE);
 } 
 
 Long64_t THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
@@ -127,7 +150,7 @@ Long64_t THSEventsPDF::AddSmearedModel(TTree* tree,RooArgList vars){
   //tree contains the MC events, 
   //vars provides all the variables that need to be cut to get same kinematics as data
   if(!tree) tree=fTree; //tree presumably aready set
-  TH2F* temph=(TH2F*)fRHist->Clone("mctemp");
+  TH2D* temph=(TH2D*)fRHist->Clone("mctemp");
   temph->SetDirectory(0);
   //Loop over vars attaching branch values to brVal
   TVectorD brVal(vars.getSize());
@@ -326,6 +349,7 @@ void THSEventsPDF::adjustBinning(Int_t* offset1) const
 void THSEventsPDF::SetWeightHist(TH1* hw,TString sx,TString sy,TString sz){
   //set a histogram to weight PDF tree with
   //sx, sy and sz should be names in the tree corresponding to the histogram axis
+  if(!hw) {cout<<"void THSEventsPDF::SetWeightHist no valid weight histogram" <<endl;return ;}
   fWeightHist=(TH1*)hw->Clone("WeightHist");
   fWeightHist->SetDirectory(0);
   fNWdim=1;

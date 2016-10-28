@@ -4,11 +4,12 @@
   gROOT->LoadMacro("$HSANA/THSBins.C+");
   gROOT->LoadMacro("$HSANA/THSWeights.C+");
   gROOT->LoadMacro("$HSANA/THSRooFit.C++");
+  gROOT->LoadMacro("$HSANA/THSsPlot.C++");
 
-  THSRooFit* RF=new THSRooFit("binFit");
+  THSsPlot* RF=new THSsPlot("binFit");
   RF->SetOutDir("outBins/");
-  // RF->SetBinnedFit(); //For parameter fits do binned chi2
-  // RF->SetSPlotRange(3,7); //Use a differnt range for sFit
+  RF->SetBinnedFit(); //For parameter fits do binned chi2
+  RF->SetSPlotRange(3,7); //Use a differnt range for sFit
  ///////////////////////////////Load Variables
   RF->LoadVariable("Mmiss[0,10]");//should be same name as variable in tree
   RF->LoadBinVars("Eg",1,3,4);//should be same name as variable in tree 
@@ -29,7 +30,7 @@
   //import to RooFit
   RF->LoadDataSet(&chain);
   gBenchmark->Start("Binned");
-  RF->RunWithBins(2);//argument gives number of parameter fits to perform
+  RF->RunWeights(2);//argument gives number of parameter fits to perform
   RF->DrawTreeVar("M1",100,0,10);
   RF->DrawTreeVar("M2",100,0,10);
   gBenchmark->Stop("Binned");

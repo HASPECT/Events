@@ -13,8 +13,8 @@ typedef map<TString, Int_t > StrIntMap_t;
 
 class THSWeights : public TNamed{
  private:
-  TTree *fWTree;  //tree of weights, branchname = species
-  TTree *fIDTree;  //tree of ids, branchname = species
+  TTree *fWTree;  //! not saved tree of weights, branchname = species
+  TTree *fIDTree;  //! not saved tree of ids, branchname = species
   StrIntMap_t fSpecies;//names of species with index in map
   TList* fWeightList; //list of weight bins which have been merged to make this
   TFile* fFile;
@@ -46,8 +46,11 @@ class THSWeights : public TNamed{
       return fWVals[ispe];
     else return 0; //entry for id not found
   }
+  Long64_t GetID(){return fID;}
   Long64_t* GetIDi(){return fIDi;};
   void SetCurrEntry(Long64_t ent){fCurrEntry=ent;}
+  Bool_t GotEntry(){return fGotEntry;}
+  Bool_t IsSorted(){return fIsSorted;}
   Long64_t GetCurrEntry(){return fCurrEntry;}
   Long64_t Size(){return fWTree->GetEntries();}
   void Add(THSWeights* wm);
@@ -66,11 +69,12 @@ class THSWeights : public TNamed{
   void BuildIndex();
   void SetFile(TString filename);
   void Save();
-  void Mem();
-  void Disk();
+  /* void Mem(); */
+  /* void Disk(); */
+  /* void LoadSavedOld(TString fname,TString wname); */
   void LoadSaved(TString fname,TString wname);
 
-  ClassDef(THSWeights, 1)  // Writeble Weight map  class
+  ClassDef(THSWeights, 2)  // Writeble Weight map  class
 };
 
 #endif //ifdef THSWeights

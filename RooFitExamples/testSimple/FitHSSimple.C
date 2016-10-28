@@ -6,8 +6,9 @@
   gROOT->LoadMacro("$HSANA/THSBins.C+");
   gROOT->LoadMacro("$HSANA/THSWeights.C+");
   gROOT->LoadMacro("$HSANA/THSRooFit.C++");
+  gROOT->LoadMacro("$HSANA/THSsPlot.C++");
 
-  THSRooFit* RF=new THSRooFit("Simple");
+  THSsPlot* RF=new THSsPlot("Simple");
   RF->SetOutDir("out/");
   RF->SetBinnedFit(); //For parameter fits do binned chi2
   ///////////////////////////////Load Variables

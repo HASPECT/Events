@@ -1,15 +1,17 @@
 
 {
-  // gSystem->AddIncludePath("-I");
-  gROOT->LoadMacro("THSBins.C+");
-  gROOT->LoadMacro("THSWeights.C+");
-  gROOT->LoadMacro("THSRooFit.C+");
-  gROOT->LoadMacro("THSEventsPDF.C+");
-  gROOT->LoadMacro("THSSimFit.C+");
+  gSystem->AddIncludePath("-I$HSANA/");
+  gROOT->LoadMacro("$HSANA/THSBins.C++");
+  gROOT->LoadMacro("$HSANA/THSWeights.C++");
+  gROOT->LoadMacro("$HSANA/THSRooFit.C++");
+  gROOT->LoadMacro("$HSANA/THSsPlot.C++");
+  gROOT->LoadMacro("$HSANA/THSEventsPDF.C++");
+  gROOT->LoadMacro("$HSANA/THSEventsFit.C++");
 
-  THSSimFit* RF=new THSSimFit("SF");
-  RF->SetOutDir("outBins0/");
-  ///////////////////////////////Load Variables
+  THSEventsFit* RF=new THSEventsFit("SF");
+  RF->SetOutDir("outBinsFarm/");
+  RF->SetWithConstraints(); //Use Gaussian contraints on alpha,off,scale
+ ///////////////////////////////Load Variables
   RF->LoadVariable("Mmiss[2,8]");//should be same name as variable in tree  
   RF->LoadBinVars("Eg",1,3,4);//should be same name as variable in tree 
   RF->LoadBinVars("M1",4,0,10);//should be same name as variable in tree 

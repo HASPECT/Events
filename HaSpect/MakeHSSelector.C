@@ -203,10 +203,11 @@ void HSit_C(){
     //Now fill the histograms in Process
     obj=macro.GetLineWith("   THSOutput::HSProcessFill();"); 
     place=lines->IndexOf(obj); //get line number
-    lines->AddAt(new TObjString("   //Int_t kinBin=GetKinBin();//if fHisbins is defined need to give this meaningful arguments"),place);
-    lines->AddAt(new TObjString("   //EnterKinBinList(kinBin,entry);//save evente in kinematic bins entry lists"),place+1);
-    lines->AddAt(new TObjString("   //FillHistograms(\"Cut1\",kinBin);"),place+1);
-    lines->AddAt(new TObjString("   FillHistograms(\"Cut1\",0);"),place+2);
+    lines->AddAt(new TObjString("   Int_t kinBin=0;//default to bins defined"),place);
+     lines->AddAt(new TObjString("   //Int_t kinBin=GetKinBin();//if fHisbins is defined need to give this meaningful arguments"),place+1);
+   lines->AddAt(new TObjString("   //EnterKinBinList(kinBin,entry);//save evente in kinematic bins entry lists"),place+2);
+   //lines->AddAt(new TObjString("   //FillHistograms(\"Cut1\",kinBin);"),place+1);
+    lines->AddAt(new TObjString("   FillHistograms(\"Cut1\",kinBin);"),place+3);
 
 
     //And the user defined functions
@@ -564,26 +565,18 @@ void UseSWeight(){
   obj=macroH.GetLineWith( "// List of branches");
   Int_t place=lines->IndexOf(obj); //get line number   
   lines->AddAt(new TObjString("   //Data members for reading sWeights"),place++); 
-  lines->AddAt(new TObjString("   THSWeightMap* fWeights;"),place++); 
+  lines->AddAt(new TObjString("   THSWeights* fWeights;"),place++); 
 
   //header info
   obj=macroH.GetLineWith( "#include \"THSOutput.h\"");
   place=lines->IndexOf(obj)+1; //get line number   
-  lines->AddAt(new TObjString("#include \"THSRooFit.h\""),place++); 
+  lines->AddAt(new TObjString("#include \"THSWeights.h\""),place++); 
 
   //Additional initialisation at constructor
   TString sline=macroH.GetLineWith("fChain(0)")->GetString();
   sline.ReplaceAll("fChain(0)","fChain(0),fWeights(0)");
   macroH.GetLineWith("fChain(0)")->SetString(sline);
 
-  // //Add brances if appending tree with weights
-  // if(IsAppendTree){//Automiatically add Qval, SigmaMean etc to appened tree
-  //    obj=macroH.GetLineWith( "//e.g. fOutTree->Branch(\"p1\",&fp1,buff,split);");
-  //    place=lines->IndexOf(obj)+1; //get line number
-  //    lines->AddAt(new TObjString("   //sWeight append branches"),place++); 
-  //    lines->AddAt(new TObjString("   fOutTree->Branch(\"SigW\",&fSigW,\"SigW/F\");"),place++); 
-  //    lines->AddAt(new TObjString("   fOutTree->Branch(\"BckW\",&fBckW,\"BckW/F\");"),place++);     
-  //  }
   macroH.SaveSource(SelName+".h");
 
   ////////////////////////////////////.C
@@ -591,61 +584,74 @@ void UseSWeight(){
   TMacro macroC(SelName+".C");
   lines=macroC.GetListOfLines();
   obj=0;
-  // if(IsNewTree){//if creating new file for sWeight branches
-  //   obj=macroC.GetLineWith( "//e.g.  fOutTree->Branch(\"p1\",&fp1,buff,split);");
-  //   place=lines->IndexOf(obj)+1; //get line number
-  //   lines->AddAt(new TObjString("   //sWeighter make new output tree"),place++); 
-  //   lines->AddAt(new TObjString("   fOutTree->Branch(\"SigW\",&fSigW,\"SigW/F\");"),place++); 
-  //   lines->AddAt(new TObjString("   fOutTree->Branch(\"BckW\",&fBckW,\"BckW/F\");"),place++);     
-  // }
   //SlaveBegin get the sPlots list and SWKinBins file
   obj=macroC.GetLineWith( "THSOutput::HSSlaveBegin(fInput,fOutput);");
-  place=lines->IndexOf(obj)+1; //get line number   
+  place=lines->IndexOf(obj)+1; //get line number 
+  //  if(!((TString*)lines->At(place))->String().Contains("GetOption()"))place++;  
   lines->AddAt(new TObjString("   //Get weights from file"),place++); 
-  lines->AddAt(new TObjString("   fWeights=new THSWeightMap();"),place++); 
-  lines->AddAt(new TObjString("   fWeights->SetMap(option,\"WeightMap\");"),place++); 
-  lines->AddAt(new TObjString("   cout<<\"Printing WeightMap \"<<endl;"),place++); 
-  lines->AddAt(new TObjString("   fWeights->PrintWeight();"),place++); 
+  lines->AddAt(new TObjString("   //Filename and object name should be passed via selector option"),place++); 
+  lines->AddAt(new TObjString("   TObjArray* OptList = option.Tokenize(\":\");"),place++); 
+  lines->AddAt(new TObjString("   if(OptList->GetEntries()>1){"),place++); 
+  lines->AddAt(new TObjString("     TString fname=((TObjString*)OptList->At(0))->String();"),place++); 
+  lines->AddAt(new TObjString("     TString wname=((TObjString*)OptList->At(1))->String();"),place++); 
+  lines->AddAt(new TObjString("     cout<<\" SlaveBegin Opening weights \"<<fname<<\" \"<<wname<<endl;"),place++); 
+  lines->AddAt(new TObjString(""),place++); 
+  lines->AddAt(new TObjString("     fWeights=new THSWeights();"),place++); 
+  lines->AddAt(new TObjString("     fWeights->LoadSaved(fname,wname);"),place++); 
+  lines->AddAt(new TObjString("     cout<<\"Printing WeightMap \"<<endl;"),place++); 
+  lines->AddAt(new TObjString("     fWeights->PrintWeight();"),place++); 
+  lines->AddAt(new TObjString("   };"),place++); 
  
-  obj=macroC.GetLineWith( "THSHisto::LoadCut(\"Cut1\");");
-  place=lines->IndexOf(obj)+1; //get line number  
-  TString sline=macroC.GetLineWith("THSHisto::LoadCut(\"Cut1\");")->GetString();
-  sline.ReplaceAll("THSHisto::LoadCut(\"Cut1\");","//THSHisto::LoadCut(\"Cut1\");");
-  macroC.GetLineWith("THSHisto::LoadCut(\"Cut1\");")->SetString(sline);
-  lines->AddAt(new TObjString("   //Load histograms for each species that has a weight"),place++); 
-  lines->AddAt(new TObjString("   if(fWeights){"),place++); 
-  lines->AddAt(new TObjString("     StrIntMap_t spec=fWeights->GetSpecies();"),place++); 
-  lines->AddAt(new TObjString("     for(StrIntMap_t::iterator its=spec.begin();its!=spec.end();++its)"),place++); 
-  lines->AddAt(new TObjString("       THSHisto::LoadCut(its->first);"),place++); 
-  lines->AddAt(new TObjString("    }"),place++); 
- 
-  //Process, 
-  obj=macroC.GetLineWith( "FillHistograms(\"Cut1\",0);");
-  place=lines->IndexOf(obj)+1; //get line number  
-  TString sline=macroC.GetLineWith("FillHistograms(\"Cut1\",0);")->GetString();
-  sline.ReplaceAll("FillHistograms(\"Cut1\",0);","//FillHistograms(\"Cut1\",0);");
-  macroC.GetLineWith("FillHistograms(\"Cut1\",0);")->SetString(sline);
-  lines->AddAt(new TObjString("   //Fill histograms for each species"),place++);
-  lines->AddAt(new TObjString("   if(fWeights){"),place++);
-  lines->AddAt(new TObjString("     StrIntMap_t spec=fWeights->GetSpecies();"),place++);
-  lines->AddAt(new TObjString("     for(StrIntMap_t::iterator itss=spec.begin();itss!=spec.end();++itss)"),place++);
-  lines->AddAt(new TObjString("       FillHistograms(itss->first,0);"),place++);
-  lines->AddAt(new TObjString("   }"),place++);
- 
+  if(IsHisto){
+    obj=macroC.GetLineWith( "THSHisto::LoadCut(\"Cut1\");");
+    place=lines->IndexOf(obj)+1; //get line number  
+    TString sline=macroC.GetLineWith("THSHisto::LoadCut(\"Cut1\");")->GetString();
+    sline.ReplaceAll("THSHisto::LoadCut(\"Cut1\");","//THSHisto::LoadCut(\"Cut1\");");
+    macroC.GetLineWith("THSHisto::LoadCut(\"Cut1\");")->SetString(sline);
+    lines->AddAt(new TObjString("   //Load histograms for each species that has a weight"),place++); 
+    lines->AddAt(new TObjString("   if(fWeights){"),place++); 
+    lines->AddAt(new TObjString("     StrIntMap_t spec=fWeights->GetSpecies();"),place++); 
+    lines->AddAt(new TObjString("     for(StrIntMap_t::iterator its=spec.begin();its!=spec.end();++its)"),place++); 
+    lines->AddAt(new TObjString("       THSHisto::LoadCut(its->first);"),place++); 
+    lines->AddAt(new TObjString("    }"),place++); 
+    
+    //Process, 
+    obj=macroC.GetLineWith( "FillHistograms(\"Cut1\",kinBin);");
+    place=lines->IndexOf(obj)+1; //get line number  
+    TString sline=macroC.GetLineWith("FillHistograms(\"Cut1\",kinBin);")->GetString();
+    sline.ReplaceAll("FillHistograms(\"Cut1\",kinBin);","//FillHistograms(\"Cut1\",kinBin);");
+    macroC.GetLineWith("FillHistograms(\"Cut1\",kinBin);")->SetString(sline);
+    lines->AddAt(new TObjString("   //Fill histograms for each species"),place++);
+    lines->AddAt(new TObjString("   if(fWeights){"),place++);
+    lines->AddAt(new TObjString("     if(fWeights->GetEntryBinarySearch(fgID)){//find weight from fgID"),place++);
+    lines->AddAt(new TObjString("       StrIntMap_t spec=fWeights->GetSpecies();"),place++);
+    lines->AddAt(new TObjString("       for(StrIntMap_t::iterator itss=spec.begin();itss!=spec.end();++itss)"),place++);
+    lines->AddAt(new TObjString("         FillHistograms(itss->first,kinBin);"),place++);
+    lines->AddAt(new TObjString("       }"),place++);
+    lines->AddAt(new TObjString("   }"),place++);
+    
 
-  obj=macroC.GetLineWith( "// e.g. FindHist(\"Mp1\")->Fill(fp1->M());");
-  place=lines->IndexOf(obj)+1; //get line number  
-  lines->AddAt(new TObjString("   Double_t Weight=1;"),place++);
-  lines->AddAt(new TObjString("   if(fWeights->Size()>0)"),place++);
-  lines->AddAt(new TObjString("     Weight=fWeights->GetWeight(fgID,fWeights->GetSpeciesID(sCut));"),place++);
+    obj=macroC.GetLineWith( "// e.g. FindHist(\"Mp1\")->Fill(fp1->M());");
+    place=lines->IndexOf(obj)+1; //get line number  
+    lines->AddAt(new TObjString("   Double_t Weight=1;"),place++);
+    lines->AddAt(new TObjString("   if(fWeights){"),place++);
+    lines->AddAt(new TObjString("     if(fWeights->Size()>0)"),place++);
+    lines->AddAt(new TObjString("       Weight=fWeights->GetWeight(sCut);"),place++);
+    lines->AddAt(new TObjString("     if(fWeights->GotEntry()&&sCut==TString(\"All\")) Weight=1;"),place++);
+    lines->AddAt(new TObjString("     }"),place++);
+    lines->AddAt(new TObjString(" //Find and fill weighted hist below here"),place++);
+    lines->AddAt(new TObjString(" //e.g. FindHist(\"Mp1\")->Fill(fp1->M(),Weight);"),place++);
+    lines->AddAt(new TObjString(" //e.g. ((TH2F*)FindHist(\"Mp1VMmiss\"))->Fill(fp1->M(),Mmiss,Weight);"),place++);
+
+
+  }
 ////////////end GetsWeight function
 
   macroC.SaveSource(SelName+".C");
-
   //Control macro
   TMacro macroCon(TString("Control_")+SelName+".C");
   TString cline=macroCon.GetLineWith("tree->Process(")->GetString();
-  cline.ReplaceAll(")",",\"WEIGHTSFILEHERE.root\")");
+  cline.ReplaceAll(")",",\"WEIGHTSFILEHERE.root:NameOfWeightsObject\")");
   macroCon.GetLineWith("tree->Process(")->SetString(cline);
   macroCon.SaveSource(TString("Control_")+SelName+".C");
 

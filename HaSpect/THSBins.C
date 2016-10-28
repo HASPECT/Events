@@ -3,6 +3,7 @@
 #include "TROOT.h"
 #include "TDirectory.h"
 #include "TVectorT.h"
+#include <algorithm>
 
 
 ClassImp(THSBins)	
@@ -77,10 +78,15 @@ void THSBins::IterateAxis(Int_t iA,TString binName) {
     cout<<binName<<endl;
     return;
   }
+  VecString_t part;
   for (int iB = 1; iB <= fVarAxis[iA].GetNbins(); iB++) { 
     fVarAxis[iA].SetBinLabel(iB,Form("%1.2f_",fVarAxis[iA].GetBinCenter(iB)));
+    part.push_back(TString(fVarAxis[iA].GetName())+fVarAxis[iA].GetBinLabel(iB));
     IterateAxis(iA+1,binName+fVarAxis[iA].GetName()+fVarAxis[iA].GetBinLabel(iB));
    }
+  if(std::find(fPartName.begin(),fPartName.end(),part)==fPartName.end()) {
+    fPartName.insert(fPartName.begin(),part);//for correct ordering with fVar.Axis vector
+  }
 }
 
 void THSBins::RunBinTree(TTree* tree){
