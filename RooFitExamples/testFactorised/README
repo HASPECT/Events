@@ -1,0 +1,64 @@
+This example follows on from testEventsPDF, but covers the case when it is required to fit 2 variables to disentangle 2 sepetate types of background. The method employed is to perform 2 "factorised" fits the second using the weights from the first to remove one of the contributions from the first fit. Note the resulting weights after the second fit will be the product of the sWeights from the 2 fits.
+/////////////////////////////////////////////////////////////////////
+MODEL
+In this case there is a signal and 2 backgrounds. The signal and BG1 have the same shape in the Mmiss variable, while BG2 is different. The signal and BG1 have different distributions in M1 so this can be used as a second discriminatory variable.
+The branches are similar as for testEventPDF
+/////////////////////////////////////////////////////////////////////
+FitHSFactorisedMmiss.C
+The first fit is going to be on Mmiss to seperate the Signal and BG1 from BG2.
+The code is very similar to testEventPDF, some parts are highlighted here:
+Create EventsFit object and give an output directory.
+  THSEventsFit* RF=new THSEventsFit("EF");
+  RF->SetOutDir("outMmiss/");
+First I am going to fit Mmiss
+  RF->LoadVariable("Mmiss[0,10]");//should be same name as variable in tree 
+
+Now I am going to merge the "not BG2" species into 1 PDF as they have the same shape. This is done after the parameter fits and prior to the sPlot fit, so actually it does not really matter if they have different shapes. But note the wummed weight will be called "Merged" rather than Singal or BG1.
+  RF->SetSingleSpecies("BG2"); //Merge all backgrounds into 1 PDF for sFit
+
+Note now when loading the species there are 3 sets Signal, BG1 and BG2. Also the second argument in LoadSpecies gives an initial scale to the yield parameter, so a species loaded with 2 will have a yield parameter starting value that is half a species with 1.
+  RF->Factory("THSEventsPDF::BG1(Mmiss,alphaB1[0,0,1],offB1[0,0,0],scaleB1[1.,1,1],100,20)");
+  ...
+  RF->LoadSpeciesPDF("BG1",2);
+
+In principle I should probably make the alphaB1 offB1 and scaleB1 the same parameters as for Signal. I would do this just by chaning there names to be the same and omitting the limits, i.e. alpha, off and scale.
+At the end of the macro the weights are saved into one file in the output directory outMmiss/WeightsEF.root :
+  RF->GetWeights()->Save();
+
+////////////////////////////////////////////////////////////////////
+Part 2
+The weights I found in the first fit can now be used to seperate out Signal and BG1. I will perform a second fit on their discriminatory variable to isolate the Signal distribution only.
+
+FitHSFactorisedM1.C
+Again the macro is very similar to before.
+HEre though I am just going to perform 1 fit so the number of bins is 1 for each variable. By loading the variables as such it still makes sure the limits are applied. Note though that any event which was outwith the limits of the fitst fit will autmoatically be rejected in this fit as it has no weight.
+  RF->LoadVariable("M1[0,10]");//fit variable
+  RF->LoadBinVars("Eg",1,3,4);//should be same name as variable in tree 
+  RF->LoadBinVars("M2",1,0,10);//should be same name as variable in tree 
+
+Now I load my two types of species and create a PDF for the variable M1,
+  RF->Factory("THSEventsPDF::Signal(M1,alpha[0,0,1],off[0,-2,2],scale[1.,0.9,1.1],100,20)");
+and so on
+The only real difference is in loading the data.Here we must give the name of the file containing the weights from the fits in part1, as well as the species we want to isolate. In this case we want to fit the Signal and BG1 contributions which were combined into the "Merged" weight.
+ 
+  TChain chain("MyModel");
+  chain.AddFile("Data.root");
+  RF->SetIDBranchName("fgID");
+  //import to RooFit
+  RF->LoadDataSet(&chain);
+  gBenchmark->Start("Binned");
+
+  RF->LoadWeights("outMmiss/WeightsEF.root","WeightMap");
+  RF->SetWeightName("Merged");
+  RF->SetDataWeight();
+
+We can then run the sWeights fits as before and draw variables.
+  RF->RunWeights(3); //Do 3 parameter fits and take the "best"
+  RF->DrawTreeVar("Eg",100,3,4);
+  RF->DrawTreeVar("M1",100,0,10);
+  RF->DrawTreeVar("M2",100,0,10);
+I can save the plots and weights associated with this fit
+  RF->SavePlots("");
+  RF->GetWeights()->Save();
+And I end up with the following files in outM1. Note as there only was 1 bin the weights in WeightsEg3.50_M25.00_.root and   WeightsSF.root should be the same (although you may observe WeightsSF.root is twice as large, the trees will have the same entries)
+BinsBG1.root  BinsSignal.root  DataEntries.root  ResultsEg3.50_M25.00_.root  ResultsSF.root  WeightsEg3.50_M25.00_.root  WeightsSF.root
