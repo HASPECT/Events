@@ -87,7 +87,6 @@ void THSEventsFit::RunWeights(Int_t Nbins){
 	    GetWorkSpace()->removeSet("PDFs");
 	    GetWorkSpace()->defineSet("Yields",GetYields());
 	    GetWorkSpace()->defineSet("PDFs",GetPDFs());	
-	    exit(0);
 
 	  }
 	}
