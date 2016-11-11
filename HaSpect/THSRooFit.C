@@ -237,7 +237,6 @@ void THSRooFit::DefineSets(){
 }
 void THSRooFit::Fit(Bool_t randPar){   
   cout<<"THSRooFit::Fit() "<<endl;
-  if(!fModel) fModel=fWS->pdf("K0Lambda");
   fModel->Print();
   if(randPar) RandomisePars();
   if (fResult) delete fResult;
@@ -502,6 +501,7 @@ void THSRooFit::FitMany(Int_t Nfits){
   TVectorD loglh(Nfits);
   //Fit the model to data with all paramters free
   //first fit use initial paramter values
+  if(!fModel) fModel=(RooAbsPdf*)&(fPDFs[0]);//Not ideal, will just take the fist PDF loaded by LoadSpecies unless TotalPDF has already been called.
   Fit();
   //plot result
   PlotDataModel();

@@ -17,6 +17,7 @@ echo $HOST
 setenv INPUT "Farm"$JOBNAME".root"
 setenv LOG "Farm"$JOBNAME".log"
 
+#IMPORTANT!!!!!!!!!!
 #copy data and analysis files
 scp dglazier@npc72:$FILEDIR/$INPUT .
 cp $RUNMAC .
