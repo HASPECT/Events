@@ -32,10 +32,28 @@
 
   gBenchmark->Start("Binned");
   RF->FitWithBins(1);//argument gives number of parameter fits to perform
-   gBenchmark->Stop("Binned");
+  gBenchmark->Stop("Binned");
   gBenchmark->Print("Binned");
 
- 
+
+  //example of how to draw asymmetries
+  RooCategory *polState=RF->GetWorkSpace()->cat("PolState");
+  for(Int_t ib=0;ib<RF->GetFits()->GetEntries();ib++){
+    RooAbsPdf* bpdf=((THSRooFit*)RF->GetFits()->At(ib))->GetModel();
+    RooAbsData* bdata=((THSRooFit*)RF->GetFits()->At(ib))->GetData();
+    RooRealVar* vpol=((THSRooFit*)RF->GetFits()->At(ib))->GetWorkSpace()->var("Pol");
+    //Pol is a variable so it will average flat pol over whole range
+    //Here we are better with the average polarisation from the data in this bin
+    //This can be done by projecting a slice in Pol around the mean value...
+    TString RName=Form("Rpol%d",ib);
+    vpol->setRange(RName.Data(),bdata->mean(*vpol)-0.01,bdata->mean(*vpol)+0.01);
+
+    RooPlot* frameX= RF->GetWorkSpace()->var("Phi")->frame();
+    bdata->plotOn(frameX,RooFit::Asymmetry(*polState),RooFit::MarkerColor(kBlue)); 
+    bpdf->plotOn(frameX,RooFit::ProjectionRange(RName.Data()),RooFit::Asymmetry(*polState),RooFit::LineColor(kBlue))  ;
+    new TCanvas();
+    frameX->Draw();
+  }
 
 
 }
