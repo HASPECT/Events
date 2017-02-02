@@ -39,6 +39,8 @@
   //chain deleted so recreate for extra plots  
   TChain chain2("MyModel");
   chain2.AddFile("Data.root");
+  RF->SavePlots("");
+  RF->GetWeights()->Save();
  
 
 
